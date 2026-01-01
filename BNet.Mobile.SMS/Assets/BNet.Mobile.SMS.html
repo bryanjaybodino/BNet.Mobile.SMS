@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+
+    <link href="libraries/bootstrap.min.css" rel="stylesheet" />
+    <link href="libraries/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        html {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+    <title>BNET SMS</title>
+</head>
+
+<body class="bg-body">
+    <div class="container px-3 py-3">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-primary mb-1">SMS Integration</h2>
+                <div class="fw-bold text-muted">Websocket Connection : </div>
+                <small id="Label_Connection" class="text-muted">ws://0.0.0.0:8030</small>
+            </div>
+
+            <!-- Theme Toggle Icon -->
+            <div class="text-end mb-4 px-2">
+                <i class="fs-3" id="themeToggle" style="cursor:pointer;"></i>
+            </div>
+
+
+        </div>
+
+        <!-- Sent Messages -->
+        <div class="card shadow-sm rounded-4 mb-3">
+            <div class="card-body bg-success text-white rounded-4">
+                <h6 class="fw-bold mb-3">Sent Messages</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Queue</span><span id="Label_SentQueue">0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Success</span><span id="Label_SentSuccess">0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Failed</span><span id="Label_SentFailed">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Database -->
+        <div class="card shadow-sm rounded-4 mb-4">
+            <div class="card-body bg-secondary text-white rounded-4">
+                <h6 class="fw-bold mb-3">No Database Found</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Queue</span><span>0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Success</span><span>0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card shadow-sm rounded-4 mb-2">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-stop-circle fs-3 text-danger"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">Stop Service</div>
+                    <small class="text-muted">Immediately stop SMS</small>
+                </div>
+                <button class="btn btn-sm btn-outline-danger">Stop</button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm rounded-4 mb-2">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-file-earmark-text fs-3 text-info"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">Instructions</div>
+                    <small class="text-muted">How to use service</small>
+                </div>
+                <button class="btn btn-sm btn-outline-info">Open</button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm rounded-4 mb-2">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-gear fs-3 text-warning"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">Settings</div>
+                    <small class="text-muted">Configure options</small>
+                </div>
+                <button class="btn btn-sm btn-outline-warning">Open</button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm rounded-4 mb-4">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-person-circle fs-3 text-success"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">Developer</div>
+                    <small class="text-muted">Profile details</small>
+                </div>
+                <button class="btn btn-sm btn-outline-success">View</button>
+            </div>
+        </div>
+
+        <!-- Service Status -->
+        <div class="card shadow-sm rounded-4">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="fw-semibold">Service Status</div>
+                    <small class="text-muted">Enable / Disable</small>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="libraries/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const toggleIcon = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        // Function to update the icon
+        function updateIcon() {
+            if (html.getAttribute('data-bs-theme') === 'dark') {
+                toggleIcon.className = 'bi bi-sun fs-3'; // Sun icon in dark mode
+            } else {
+                toggleIcon.className = 'bi bi-moon-stars fs-3'; // Moon icon in light mode
+            }
+        }
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.setAttribute('data-bs-theme', savedTheme);
+        }
+        updateIcon();
+
+        // Toggle theme on click
+        toggleIcon.addEventListener('click', () => {
+            const current = html.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon();
+        });
+
+    </script>
+
+
+
+
+    <script>
+        function submitText() {
+            //    window.ScriptContext.Submit("a");
+        }
+    </script>
+</body>
+</html>
