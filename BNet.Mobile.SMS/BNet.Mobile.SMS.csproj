@@ -71,6 +71,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptContext.cs" />
     <Compile Include="Services\MyNetwork\NetworkChecker.cs" />
+    <Compile Include="Services\ServiceBus\TimeTrigger.cs" />
+    <Compile Include="Services\SmsService\SaveMessage.cs" />
+    <Compile Include="Services\SmsService\SendMessage.cs" />
+    <Compile Include="Services\TempData\SaveQueue.cs" />
     <Compile Include="Services\TempData\SendQueue.cs" />
     <Compile Include="Services\Websocket\Models\SendPayload.cs" />
     <Compile Include="Services\Websocket\ServerSocketConnection.cs" />

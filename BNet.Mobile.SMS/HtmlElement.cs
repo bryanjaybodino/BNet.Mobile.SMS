@@ -14,7 +14,7 @@ namespace BNet.Mobile.SMS
     internal class HtmlElement
     {
         public static string Label_Connection = "Label_Connection";
-        public static string Label_SentLabel_SentQueueSuccess = "Label_SentQueue";
+        public static string Label_SentQueue = "Label_SentQueue";
         public static string Label_SentSuccess = "Label_SentSuccess";
         public static string Label_SentFailed = "Label_SentFailed";
     }

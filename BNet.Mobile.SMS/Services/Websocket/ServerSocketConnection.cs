@@ -5,6 +5,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using BNet.Mobile.SMS.Services.MyNetwork;
+using BNet.Mobile.SMS.Services.TempData;
 using BNet.Mobile.SMS.Services.Websocket.Models;
 using BNet.WebSocket.Server;
 using Java.Net;
@@ -24,6 +25,26 @@ namespace BNet.Mobile.SMS.Services.Websocket
             public static Connection connection { get; set; }
         }
         NetworkChecker INetworkChecker = new NetworkChecker();
+        SendQueue ISendQueue = new SendQueue();
+
+        public async void Create()
+        {
+            try
+            {
+                if (ServerSocket.connection == null)
+                {
+                    await KeepAlive();
+                }
+                else if (!ServerSocket.connection.IsRunning)
+                {
+                    await KeepAlive();
+                }
+            }
+            catch (Exception ex)
+            {
+                ServerSocket.connection = null;
+            }
+        }
         private async Task KeepAlive()
         {
             try

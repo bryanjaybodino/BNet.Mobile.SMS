@@ -8,6 +8,10 @@ using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using BNet.Mobile.SMS.Services.MyNetwork;
+using BNet.Mobile.SMS.Services.ServiceBus;
+using BNet.Mobile.SMS.Services.SmsService;
+using BNet.Mobile.SMS.Services.TempData;
+using BNet.Mobile.SMS.Services.Websocket;
 using System.IO;
 using System.Threading.Tasks;
 using System.Timers;
@@ -19,7 +23,15 @@ namespace BNet.Mobile.SMS
     public class MainActivity : AppCompatActivity
     {
         NetworkChecker networkChecker = new NetworkChecker();
-        protected override void OnCreate(Bundle savedInstanceState)
+        ServerSocketConnection serverSocketConnection = new ServerSocketConnection();
+        SendQueue ISendQueue = new SendQueue();
+        SendMessage ISendMessage = new SendMessage();
+        TimeTrigger timeTrigger = new TimeTrigger();
+
+
+
+
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
@@ -27,14 +39,7 @@ namespace BNet.Mobile.SMS
 
             // Copy the HTML file from assets to internal storage
             CopyAssetsToInternalStorage();
-
-
-
-
-
-
-
-
+            FullScreen();
             var webView = FindViewById<WebView>(Resource.Id.webview);
             // Enable JavaScript in WebView
             webView.Settings.JavaScriptEnabled = true;
@@ -46,24 +51,25 @@ namespace BNet.Mobile.SMS
             webView.AddJavascriptInterface(scriptContext, "ScriptContext");
             WebView.SetWebContentsDebuggingEnabled(true);// Enable debugging (Logcat or Chrome DevTools)
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html");
-
-
-            // Make the activity full screen by removing the status bar
-            // Hide the status bar and make the activity full-screen
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-            {
-                var decorView = Window.DecorView;
-                int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
-                decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
-            }
-            else
-            {
-                // For lower versions, just hide the status bar
-                Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
-            }
             SupportActionBar?.Hide();
+            await StartTimer(scriptContext);
+        }
 
 
+
+        private async Task StartTimer(ScriptContext scriptContext)
+        {
+            async Task Refresh()
+            {
+                serverSocketConnection.Create();
+                scriptContext.UpdateInnerText(HtmlElement.Label_Connection, networkChecker.LocalConnection());
+                scriptContext.UpdateInnerText(HtmlElement.Label_SentQueue, (await ISendQueue.CountAsync()).ToString());
+                scriptContext.UpdateInnerText(HtmlElement.Label_SentSuccess, (ISendMessage.CountSent()).ToString());
+                scriptContext.UpdateInnerText(HtmlElement.Label_SentFailed, (ISendMessage.CountFailed()).ToString());
+                timeTrigger.ProcessSendingMessages();
+                timeTrigger.ProcessSavingMessages();
+            }
+            await Refresh();
             // create a timer
             Timer timer = new Timer(1000); // 1000ms = 1 second
             timer.Elapsed += async (sender, e) =>
@@ -71,14 +77,11 @@ namespace BNet.Mobile.SMS
                 // Switch to UI thread
                 RunOnUiThread(async () =>
                 {
-                    scriptContext.UpdateInnerText(HtmlElement.Label_Connection, networkChecker.LocalConnection());
-                    await Task.CompletedTask;
+                    await Refresh();
                 });
             };
-            timer.Start(); 
+            timer.Start();
         }
-
-
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
@@ -130,7 +133,23 @@ namespace BNet.Mobile.SMS
 
             }
         }
+        private void FullScreen()
+        {
 
+            // Make the activity full screen by removing the status bar
+            // Hide the status bar and make the activity full-screen
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+            {
+                var decorView = Window.DecorView;
+                int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
+                decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+            }
+            else
+            {
+                // For lower versions, just hide the status bar
+                Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
+            }
+        }
 
     }
 }
