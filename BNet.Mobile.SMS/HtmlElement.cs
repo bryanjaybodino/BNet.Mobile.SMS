@@ -17,5 +17,12 @@ namespace BNet.Mobile.SMS
         public static string Label_SentQueue = "Label_SentQueue";
         public static string Label_SentSuccess = "Label_SentSuccess";
         public static string Label_SentFailed = "Label_SentFailed";
+
+
+        public static string Icon_RunService = "Icon_RunService";
+        public static string Label_RunService = "Label_RunService";
+        public static string Button_SaveSettings = "Button_SaveSettings";
+
+
     }
 }

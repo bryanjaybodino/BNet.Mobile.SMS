@@ -92,6 +92,7 @@ namespace BNet.Mobile.SMS.Services.SmsService
         {
             try
             {
+
                 MessageFailed.Add(tempJson);
             }
             catch { }

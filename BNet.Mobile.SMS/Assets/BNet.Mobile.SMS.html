@@ -4,49 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
-
     <link href="libraries/bootstrap.min.css" rel="stylesheet" />
     <link href="libraries/bootstrap-icons.css" rel="stylesheet" />
     <style>
-        html {
+        html, body {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         body {
             background-color: var(--bs-body-bg);
             color: var(--bs-body-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 10px;
         }
     </style>
     <title>BNET SMS</title>
 </head>
 
-<body class="bg-body">
-    <div class="container px-3 py-3">
+<body>
+    <div class="container">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between mb-3">
             <div>
                 <h2 class="fw-bold text-primary mb-1">SMS Integration</h2>
-                <div class="fw-bold text-muted">Websocket Connection : </div>
+                <div class="fw-bold text-muted">Websocket Connection: </div>
                 <small id="Label_Connection" class="text-muted">ws://0.0.0.0:8030</small>
             </div>
-
-            <!-- Theme Toggle Icon -->
-            <div class="text-end mb-4 px-2">
+            <div class="text-end px-2">
                 <i class="fs-3" id="themeToggle" style="cursor:pointer;"></i>
             </div>
-
-
         </div>
 
         <!-- Sent Messages -->
-        <div class="card shadow-sm rounded-4 mb-3">
-            <div class="card-body bg-success text-white rounded-4">
-                <h6 class="fw-bold mb-3">Sent Messages</h6>
-                <div class="d-flex justify-content-between mb-2">
+        <div class="card shadow-sm mb-2">
+            <div class="card-body bg-success text-white">
+                <h6 class="fw-bold mb-2">Sent Messages</h6>
+                <div class="d-flex justify-content-between">
                     <span>Queue</span><span id="Label_SentQueue">0</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
+                <div class="d-flex justify-content-between">
                     <span>Success</span><span id="Label_SentSuccess">0</span>
                 </div>
                 <div class="d-flex justify-content-between">
@@ -56,10 +51,10 @@
         </div>
 
         <!-- No Database -->
-        <div class="card shadow-sm rounded-4 mb-4">
-            <div class="card-body bg-secondary text-white rounded-4">
-                <h6 class="fw-bold mb-3">No Database Found</h6>
-                <div class="d-flex justify-content-between mb-2">
+        <div class="card shadow-sm mb-2">
+            <div class="card-body bg-secondary text-white">
+                <h6 class="fw-bold mb-2">No Database Found</h6>
+                <div class="d-flex justify-content-between">
                     <span>Queue</span><span>0</span>
                 </div>
                 <div class="d-flex justify-content-between">
@@ -69,52 +64,50 @@
         </div>
 
         <!-- Actions -->
-        <div class="card shadow-sm rounded-4 mb-2">
-            <div class="card-body d-flex align-items-center gap-3">
-                <i class="bi bi-stop-circle fs-3 text-danger"></i>
+        <div class="card shadow-sm mb-2" onclick="Service()">
+            <div class="card-body d-flex gap-2">
+                <i id="Icon_RunService" class="bi bi-play-circle fs-3 text-success"></i>
                 <div class="flex-grow-1">
-                    <div class="fw-semibold">Stop Service</div>
-                    <small class="text-muted">Immediately stop SMS</small>
+                    <div id="Label_RunService" class="fw-semibold">Start Service</div>
+                    <small class="text-muted">Run SMS on the background</small>
                 </div>
-                <button class="btn btn-sm btn-outline-danger">Stop</button>
             </div>
         </div>
 
-        <div class="card shadow-sm rounded-4 mb-2">
-            <div class="card-body d-flex align-items-center gap-3">
+        <div class="card shadow-sm mb-2">
+            <div class="card-body d-flex gap-2">
                 <i class="bi bi-file-earmark-text fs-3 text-info"></i>
                 <div class="flex-grow-1">
                     <div class="fw-semibold">Instructions</div>
                     <small class="text-muted">How to use service</small>
                 </div>
-                <button class="btn btn-sm btn-outline-info">Open</button>
             </div>
         </div>
 
-        <div class="card shadow-sm rounded-4 mb-2">
-            <div class="card-body d-flex align-items-center gap-3">
+        <!-- Settings (Triggers Modal) -->
+        <div class="card shadow-sm mb-2" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <div class="card-body d-flex gap-2">
                 <i class="bi bi-gear fs-3 text-warning"></i>
                 <div class="flex-grow-1">
                     <div class="fw-semibold">Settings</div>
                     <small class="text-muted">Configure options</small>
                 </div>
-                <button class="btn btn-sm btn-outline-warning">Open</button>
             </div>
         </div>
 
-        <div class="card shadow-sm rounded-4 mb-4">
-            <div class="card-body d-flex align-items-center gap-3">
+        <!-- Developer -->
+        <div class="card shadow-sm mb-2">
+            <div class="card-body d-flex gap-2">
                 <i class="bi bi-person-circle fs-3 text-success"></i>
                 <div class="flex-grow-1">
                     <div class="fw-semibold">Developer</div>
                     <small class="text-muted">Profile details</small>
                 </div>
-                <button class="btn btn-sm btn-outline-success">View</button>
             </div>
         </div>
 
         <!-- Service Status -->
-        <div class="card shadow-sm rounded-4">
+        <div class="card shadow-sm">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <div class="fw-semibold">Service Status</div>
@@ -125,48 +118,111 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <script src="libraries/bootstrap.bundle.min.js"></script>
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tabs for WebSocket and Database settings -->
+                    <ul class="nav nav-tabs" id="settingsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="websocket-tab" data-bs-toggle="tab" href="#websocket" role="tab" aria-controls="websocket" aria-selected="true">WebSocket</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="database-tab" data-bs-toggle="tab" href="#database" role="tab" aria-controls="database" aria-selected="false">Database</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3" id="settingsTabContent">
+                        <!-- WebSocket Tab -->
+                        <div class="tab-pane fade show active" id="websocket" role="tabpanel" aria-labelledby="websocket-tab">
+                            <div class="mb-3">
+                                <label for="websocket-url" class="form-label">WebSocket URL</label>
+                                <input type="text" class="form-control" id="websocket-url" value="ws://0.0.0.0:8030">
+                            </div>
+                        </div>
+                        <!-- Database Tab -->
+                        <div class="tab-pane fade" id="database" role="tabpanel" aria-labelledby="database-tab">
+                            <div class="mb-3">
+                                <label for="database-status" class="form-label">Database Status</label>
+                                <textarea class="form-control" id="database-connection" rows="4">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="Button_SaveSettings" class="btn btn-primary" onclick="SaveSettings()">
+                        Save changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+
+
+
+
+    <script src="libraries/bootstrap.bundle.min.js"></script>
     <script>
         const toggleIcon = document.getElementById('themeToggle');
         const html = document.documentElement;
-
-        // Function to update the icon
         function updateIcon() {
-            if (html.getAttribute('data-bs-theme') === 'dark') {
-                toggleIcon.className = 'bi bi-sun fs-3'; // Sun icon in dark mode
-            } else {
-                toggleIcon.className = 'bi bi-moon-stars fs-3'; // Moon icon in light mode
-            }
+            toggleIcon.className = html.getAttribute('data-bs-theme') === 'dark' ? 'bi bi-sun fs-3' : 'bi bi-moon-stars fs-3';
         }
-        // Load saved theme
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            html.setAttribute('data-bs-theme', savedTheme);
-        }
+        if (savedTheme) html.setAttribute('data-bs-theme', savedTheme);
         updateIcon();
-
-        // Toggle theme on click
         toggleIcon.addEventListener('click', () => {
-            const current = html.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
-            const newTheme = current === 'dark' ? 'light' : 'dark';
+            const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateIcon();
         });
-
     </script>
-
-
-
 
     <script>
-        function submitText() {
-            //    window.ScriptContext.Submit("a");
+
+
+        function Service() {
+            var iconClassName = document.getElementById('Icon_RunService').className;
+            window.ScriptContext.Service(iconClassName);
+        }
+
+        // Function to handle saving settings and show loading spinner
+        function SaveSettings() {
+            const saveBtn = document.getElementById('Button_SaveSettings');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Saving... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            // Detect the current active tab
+            const activeTab = document.querySelector('.nav-link.active'); // Get the currently active tab
+            const activeTabId = activeTab ? activeTab.id : null;
+
+            if (activeTabId === 'websocket-tab') {
+                // Handle WebSocket settings saving (if any action is required)
+                console.log('Saving WebSocket settings');
+                // For example, you could add logic to get the WebSocket URL and process it
+                var websocketUrl = document.getElementById('websocket-url').value;
+                window.ScriptContext.CreateWebSocket(websocketUrl); // Assuming you have such a method
+            }
+            else if (activeTabId === 'database-tab') {
+                // Get the value and remove any newlines (line breaks)
+                var connectionString = document.getElementById('database-connection').value.replace(/(\r\n|\n|\r)/gm, "");
+                // Send the cleaned string
+                window.ScriptContext.CreateDatabase(connectionString);
+            }
         }
     </script>
+
+
+
+
 </body>
 </html>

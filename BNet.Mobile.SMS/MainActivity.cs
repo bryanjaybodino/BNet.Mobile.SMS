@@ -1,4 +1,7 @@
-﻿using Android.App;
+﻿using Android;
+using Android.App;
+using Android.Content;
+using Android.Content.PM;
 using Android.Content.Res;
 using Android.OS;
 using Android.Runtime;
@@ -7,12 +10,15 @@ using Android.Views;
 using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
+using AndroidX.LocalBroadcastManager.Content;
+using BNet.Mobile.SMS.Services.BroadCastReceiver;
 using BNet.Mobile.SMS.Services.MyNetwork;
 using BNet.Mobile.SMS.Services.ServiceBus;
 using BNet.Mobile.SMS.Services.SmsService;
 using BNet.Mobile.SMS.Services.TempData;
 using BNet.Mobile.SMS.Services.Websocket;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using static Google.Android.Material.Tabs.TabLayout;
@@ -22,14 +28,26 @@ namespace BNet.Mobile.SMS
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
+
+        // AD HOC PASSWORD : 123456
+
+        const int RequestSmsPermissionsId = 101;
+
+        readonly string[] SmsPermissions =
+        {
+            Manifest.Permission.ReadSms,
+            Manifest.Permission.ReceiveSms,
+            Manifest.Permission.SendSms,
+            "android.permission.POST_NOTIFICATIONS" // Optional: For Android 13+ notifications
+        };
+
+
+
         NetworkChecker networkChecker = new NetworkChecker();
         ServerSocketConnection serverSocketConnection = new ServerSocketConnection();
         SendQueue ISendQueue = new SendQueue();
         SendMessage ISendMessage = new SendMessage();
         TimeTrigger timeTrigger = new TimeTrigger();
-
-
-
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -53,8 +71,22 @@ namespace BNet.Mobile.SMS
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html");
             SupportActionBar?.Hide();
             await StartTimer(scriptContext);
-        }
 
+            // ✅ Check and request permissions at runtime
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+            {
+                if (!HasSmsPermissions())
+                {
+                    RequestPermissions(SmsPermissions, RequestSmsPermissionsId);
+                }
+            }
+
+
+
+            SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
+            IntentFilter filter = new IntentFilter("SMS_SENT");
+            RegisterReceiver(receiver, filter);
+        }
 
 
         private async Task StartTimer(ScriptContext scriptContext)
@@ -83,12 +115,38 @@ namespace BNet.Mobile.SMS
             timer.Start();
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+
+        // ✅ Helper: Check if permissions are already granted
+        bool HasSmsPermissions()
+        {
+            foreach (var permission in SmsPermissions)
+            {
+                if (CheckSelfPermission(permission) != Permission.Granted)
+                    return false;
+            }
+            return true;
+        }
+
+        // ✅ Handle the user's permission response
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
+            if (requestCode == RequestSmsPermissionsId)
+            {
+                if (grantResults.All(result => result == Permission.Granted))
+                {
+                    Toast.MakeText(this, "All permissions granted.", ToastLength.Short).Show();
+                }
+                else
+                {
+                    Toast.MakeText(this, "Some permissions were denied. App may not function properly.", ToastLength.Long).Show();
+                }
+            }
+
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+
 
         // Function to copy file from Assets to internal storage
         private void CopyAssetsToInternalStorage()
@@ -135,20 +193,9 @@ namespace BNet.Mobile.SMS
         }
         private void FullScreen()
         {
-
-            // Make the activity full screen by removing the status bar
-            // Hide the status bar and make the activity full-screen
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-            {
-                var decorView = Window.DecorView;
-                int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
-                decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
-            }
-            else
-            {
-                // For lower versions, just hide the status bar
-                Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
-            }
+            var decorView = Window.DecorView;
+            int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
+            decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
         }
 
     }
