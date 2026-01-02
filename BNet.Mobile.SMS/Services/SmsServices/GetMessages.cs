@@ -4,13 +4,13 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.SmsService.Models;
+using BNet.Mobile.SMS.Services.SmsServices.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.SmsService
+namespace BNet.Mobile.SMS.Services.SmsServices
 {
     internal class GetMessages
     {

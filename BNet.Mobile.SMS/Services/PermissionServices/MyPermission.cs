@@ -5,7 +5,7 @@ using Android.OS;
 using AndroidX.Core.App; // For ActivityCompat
 using AndroidX.Core.Content; // For ContextCompat
 
-namespace BNet.Mobile.SMS.Services.PermissionService
+namespace BNet.Mobile.SMS.Services.PermissionServices
 {
     internal class MyPermission
     {

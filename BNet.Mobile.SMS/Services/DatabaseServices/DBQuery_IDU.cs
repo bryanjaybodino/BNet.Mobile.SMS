@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.MyDatabase
+namespace BNet.Mobile.SMS.Services.DatabaseServices
 {
     public class DBQuery_IDU
     {

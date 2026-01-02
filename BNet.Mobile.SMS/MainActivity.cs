@@ -10,15 +10,10 @@ using Android.Views;
 using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
-using AndroidX.LocalBroadcastManager.Content;
-using BNet.Mobile.SMS.Services.APIService;
-using BNet.Mobile.SMS.Services.BroadCastReceiver;
-using BNet.Mobile.SMS.Services.MyNetwork;
-using BNet.Mobile.SMS.Services.NotificationService;
-using BNet.Mobile.SMS.Services.PermissionService;
+using BNet.Mobile.SMS.Services.BroadCastReceiverServices;
+using BNet.Mobile.SMS.Services.HttpListenerServices;
+using BNet.Mobile.SMS.Services.PermissionServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
-using BNet.Mobile.SMS.Services.SmsService;
-using BNet.Mobile.SMS.Services.TempData;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -107,13 +102,13 @@ namespace BNet.Mobile.SMS
         {
 
             //API Server For Client Connection
-            APIServer.Start();
+            WebServer.Start();
 
             await Task.Run(() =>
             {
                 // create a timer
                 Timer timer = new Timer(500); // 1000ms = 1 second
-                timer.Elapsed += async (sender, e) =>
+                timer.Elapsed += (sender, e) =>
                 {
                     // Switch to UI thread
                     RunOnUiThread(async () =>

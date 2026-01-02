@@ -4,10 +4,10 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.APIService.Models;
-using BNet.Mobile.SMS.Services.MyNetwork;
-using BNet.Mobile.SMS.Services.SmsService;
-using BNet.Mobile.SMS.Services.TempData;
+using BNet.Mobile.SMS.Services.HttpListenerServices.Models;
+using BNet.Mobile.SMS.Services.NetworkServices;
+using BNet.Mobile.SMS.Services.SmsServices;
+using BNet.Mobile.SMS.Services.TempDataServices;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,9 +17,9 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BNet.Mobile.SMS.Services.APIService
+namespace BNet.Mobile.SMS.Services.HttpListenerServices
 {
-    internal class APIServer
+    public class WebServer
     {
         static HttpListener listener = new HttpListener();
         public static void Start()

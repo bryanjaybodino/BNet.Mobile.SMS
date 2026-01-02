@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.ExitAppService
+namespace BNet.Mobile.SMS.Services.ExitAppServiceServices
 {
-    public class RecentTasksService 
+    public class RecentTasks
     {
         public static void RemoveAppFromRecentTasks()
         {

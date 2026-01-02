@@ -7,8 +7,8 @@ using Android.Runtime;
 using Android.Telephony;
 using Android.Views;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.SmsService;
-using BNet.Mobile.SMS.Services.TempData;
+using BNet.Mobile.SMS.Services.SmsServices;
+using BNet.Mobile.SMS.Services.TempDataServices;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BNet.Mobile.SMS.Services.BroadCastReceiver
+namespace BNet.Mobile.SMS.Services.BroadCastReceiverServices
 {
     [BroadcastReceiver(Enabled = true, Exported = true, Label = "SMS Service")]
     [IntentFilter(new[] { Telephony.Sms.Intents.SmsReceivedAction })]

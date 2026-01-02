@@ -6,7 +6,7 @@ using Android.Service.QuickSettings;
 using Android.Views;
 using Android.Widget;
 using AndroidX.Core.App;
-using BNet.Mobile.SMS.Services.APIService;
+using BNet.Mobile.SMS.Services.HttpListenerServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
 using System;
 using System.Collections.Generic;
@@ -17,11 +17,11 @@ using System.Threading.Tasks;
 using System.Timers;
 using static Android.OS.PowerManager;
 
-namespace BNet.Mobile.SMS.Services.NotificationService
+namespace BNet.Mobile.SMS.Services.ForegroundServices
 {
 
     [Service]
-    public class ForegroundService : Service
+    public class ForegroundTasks : Service
     {
         public override IBinder OnBind(Intent intent)
         {
@@ -76,7 +76,7 @@ namespace BNet.Mobile.SMS.Services.NotificationService
 
         public static void StartMyForeGroundService()
         {
-            var intent = new Intent(Android.App.Application.Context, typeof(ForegroundService));
+            var intent = new Intent(Android.App.Application.Context, typeof(ForegroundTasks));
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
@@ -92,7 +92,7 @@ namespace BNet.Mobile.SMS.Services.NotificationService
 
         public static void StopMyForeGroundService()
         {
-            var intent = new Intent(Android.App.Application.Context, typeof(ForegroundService));
+            var intent = new Intent(Android.App.Application.Context, typeof(ForegroundTasks));
             Android.App.Application.Context.StopService(intent);
         }
 
@@ -100,7 +100,7 @@ namespace BNet.Mobile.SMS.Services.NotificationService
         void StartWorker()
         {
             //API Server For Client Connection
-            APIServer.Start();
+            WebServer.Start();
             cts = new CancellationTokenSource();
 
             Task.Run(async () =>

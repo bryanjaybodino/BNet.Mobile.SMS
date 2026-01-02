@@ -5,8 +5,8 @@ using Android.Runtime;
 using Android.Telephony;
 using Android.Views;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.APIService.Models;
-using BNet.Mobile.SMS.Services.TempData;
+using BNet.Mobile.SMS.Services.HttpListenerServices.Models;
+using BNet.Mobile.SMS.Services.TempDataServices;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace BNet.Mobile.SMS.Services.SmsService
+namespace BNet.Mobile.SMS.Services.SmsServices
 {
     internal class SendMessage
     {

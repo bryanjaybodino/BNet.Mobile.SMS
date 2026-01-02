@@ -4,7 +4,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.TempData;
+using BNet.Mobile.SMS.Services.TempDataServices;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace BNet.Mobile.SMS.Services.MyDatabase
+namespace BNet.Mobile.SMS.Services.DatabaseServices
 {
     internal class MySQLService
     {

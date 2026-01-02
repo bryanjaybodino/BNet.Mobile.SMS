@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using Xamarin.Essentials;
 
-namespace BNet.Mobile.SMS.Services.TempData
+namespace BNet.Mobile.SMS.Services.TempDataServices
 {
     internal class Properties
     {

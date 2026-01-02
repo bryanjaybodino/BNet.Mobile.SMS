@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.MyNetwork
+namespace BNet.Mobile.SMS.Services.NetworkServices
 {
     internal class NetworkChecker
     {

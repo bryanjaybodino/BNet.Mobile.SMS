@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.SmsService.Models
+namespace BNet.Mobile.SMS.Services.SmsServices.Models
 {
     internal class Messages
     {

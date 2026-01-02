@@ -12,16 +12,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
-namespace BNet.Mobile.SMS.Services.TempData
+namespace BNet.Mobile.SMS.Services.TempDataServices
 {
-    internal class SendQueue
+    internal class SaveQueue
     {
         private static async Task<Queue<string>> GetQueueAsync()
         {
             var messagesList = new Queue<string>();
             try
             {
-                var jsonString = await SecureStorage.GetAsync("SEND_SMS_QUEUE");
+                var jsonString = await SecureStorage.GetAsync("SAVING_SMS_QUEUE");
                 if (!string.IsNullOrEmpty(jsonString))
                 {
                     messagesList = JsonConvert.DeserializeObject<Queue<string>>(jsonString) ?? new Queue<string>();
@@ -38,7 +38,7 @@ namespace BNet.Mobile.SMS.Services.TempData
             try
             {
                 var jsonString = JsonConvert.SerializeObject(messagesList);
-                await SecureStorage.SetAsync("SEND_SMS_QUEUE", jsonString);
+                await SecureStorage.SetAsync("SAVING_SMS_QUEUE", jsonString);
             }
             catch (Exception ex)
             {

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BNet.Mobile.SMS.Services.MyDatabase
+namespace BNet.Mobile.SMS.Services.DatabaseServices
 {
     public class CreateDatabase
     {
