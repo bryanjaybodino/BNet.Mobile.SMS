@@ -12,8 +12,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using static Android.OS.PowerManager;
 
 namespace BNet.Mobile.SMS.Services.NotificationService
 {
@@ -65,23 +67,10 @@ namespace BNet.Mobile.SMS.Services.NotificationService
                 .SetContentIntent(pendingIntent);
 
             var notification = notificationBuilder.Build();
-            StartForeground(1001, notification);
+            StartForeground(1002, notification);
 
 
-
-
-
-            //API Server For Client Connection
-            APIServer.Start();
-            // create a timer
-            Timer timer = new Timer(500); // 1000ms = 1 second
-            timer.Elapsed += async (sender, e) =>
-            {
-                //Service Bus Timer
-                TimeTrigger.ProcessSendingMessages();
-                TimeTrigger.ProcessSavingMessages();
-            };
-            timer.Start();
+            StartWorker();
             return StartCommandResult.Sticky;
         }
 
@@ -107,6 +96,25 @@ namespace BNet.Mobile.SMS.Services.NotificationService
             Android.App.Application.Context.StopService(intent);
         }
 
+        CancellationTokenSource cts;
+        void StartWorker()
+        {
+            //API Server For Client Connection
+            APIServer.Start();
+            cts = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                while (!cts.Token.IsCancellationRequested)
+                {
+                    TimeTrigger.ProcessSendingMessages();
+                    TimeTrigger.ProcessSavingMessages();
+                    await Task.Delay(500);
+                }
+            });
+        }
+
+
         static bool ServiceRunning = false;
 
         public bool IsRunning()
@@ -114,16 +122,28 @@ namespace BNet.Mobile.SMS.Services.NotificationService
             return ServiceRunning;
         }
 
+
+        PowerManager.WakeLock wakeLock;
         public override void OnCreate()
         {
             base.OnCreate();
             ServiceRunning = true;
+
+            var pm = (PowerManager)GetSystemService(PowerService);
+            wakeLock = pm.NewWakeLock(
+                WakeLockFlags.Partial,
+                "BNetSMS::HttpServerWakeLock"
+            );
+
+            wakeLock.Acquire();
         }
 
         public override void OnDestroy()
         {
+            if (wakeLock?.IsHeld == true)
+                wakeLock.Release();
+
             base.OnDestroy();
-            ServiceRunning = false;
         }
     }
 }

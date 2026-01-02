@@ -34,6 +34,16 @@ namespace BNet.Mobile.SMS
 
         // AD HOC PASSWORD : 123456
 
+        protected override void OnRestart()
+        {
+            base.OnRestart();
+            HtmlElement.Refresh();
+        }
+        protected override void OnResume()
+        {
+            base.OnResume();
+            HtmlElement.Refresh();
+        }
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -52,15 +62,9 @@ namespace BNet.Mobile.SMS
             //Full Screen Application
             FullScreen();
 
-            //API Server For Client Connection
-            APIServer.Start();
-
-
             //Check Permission
             MyPermission myPermission = new MyPermission(this);
             myPermission.EnsurePermissions();
-
-
 
             //Run Webvview
             var webView = FindViewById<WebView>(Resource.Id.webview);
@@ -73,10 +77,7 @@ namespace BNet.Mobile.SMS
             webView.AddJavascriptInterface(scriptContext, "ScriptContext");
             WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
-
-
             StartTimer(scriptContext);
-
         }
 
 
@@ -104,6 +105,10 @@ namespace BNet.Mobile.SMS
 
         private async void StartTimer(ScriptContext scriptContext)
         {
+
+            //API Server For Client Connection
+            APIServer.Start();
+
             await Task.Run(() =>
             {
                 // create a timer

@@ -5,6 +5,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using BNet.Mobile.SMS.Services.APIService.Models;
+using BNet.Mobile.SMS.Services.MyNetwork;
 using BNet.Mobile.SMS.Services.SmsService;
 using BNet.Mobile.SMS.Services.TempData;
 using Newtonsoft.Json;
@@ -27,8 +28,9 @@ namespace BNet.Mobile.SMS.Services.APIService
             {
                 try
                 {
-                    listener.Prefixes.Remove("http://*:8030/");
-                    listener.Prefixes.Add("http://*:8030/");
+                    int port = NetworkChecker.PortNumber();
+                    listener.Prefixes.Remove($"http://*:{port}/");
+                    listener.Prefixes.Add($"http://*:{port}/");
                     listener.Start();
 
                     while (true)

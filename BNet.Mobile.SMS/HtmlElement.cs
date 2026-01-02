@@ -46,7 +46,7 @@ namespace BNet.Mobile.SMS
                 scriptContext.UpdateInnerText(Label_ReceivedQueue, (await SaveQueue.CountAsync()).ToString());
                 scriptContext.UpdateInnerText(Label_ReceivedSuccess, (SaveMessage.CountSave()).ToString());
                 scriptContext.UpdateValue(Textbox_Connection, Properties.DatabaseConnection());
-                isRefresh = false;
+                isRefresh = true;
             }
         }
 
