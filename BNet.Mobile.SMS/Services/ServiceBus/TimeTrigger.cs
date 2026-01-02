@@ -15,24 +15,21 @@ namespace BNet.Mobile.SMS.Services.ServiceBus
 {
     internal class TimeTrigger
     {
-        SendQueue ISendQueue = new SendQueue();
-        SaveQueue ISaveQueue = new SaveQueue();
-        SendMessage ISendMessage = new SendMessage();
-        SaveMessage ISaveMessage = new SaveMessage();
 
-        int TimeInterval = 5;
-        int Send_TimerTrigger = 0;
-        int Save_TimerTrigger = 0;
-        public async void ProcessSendingMessages()
+
+        static int TimeInterval = 5;
+        static int Send_TimerTrigger = 0;
+        static int Save_TimerTrigger = 0;
+        public static async void ProcessSendingMessages()
         {
-            int countSent = await ISendQueue.CountAsync();
+            int countSent = await SendQueue.CountAsync();
             if (countSent > 0)
             {
                 if (Send_TimerTrigger >= (TimeInterval * 2))
                 {
                     Send_TimerTrigger = 0;
-                    string Message = await ISendQueue.PeekAsync();
-                    ISendMessage.Send(Message);
+                    string Message = await SendQueue.PeekAsync();
+                    SendMessage.Send(Message);
                 }
                 else
                 {
@@ -41,15 +38,15 @@ namespace BNet.Mobile.SMS.Services.ServiceBus
             }
         }
 
-        public async void ProcessSavingMessages()
+        public static async void ProcessSavingMessages()
         {
-            int countSave = await ISaveQueue.CountAsync();
+            int countSave = await SaveQueue.CountAsync();
             if (countSave > 0)
             {
                 if (Save_TimerTrigger >= (TimeInterval * 2))
                 {
                     Save_TimerTrigger = 0;
-                    ISaveMessage.Saved();
+                    SaveMessage.Saved();
                 }
                 else
                 {

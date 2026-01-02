@@ -22,11 +22,6 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
     [IntentFilter(new[] { Telephony.Sms.Intents.SmsReceivedAction })]
     public class SmsReceiver : BroadcastReceiver
     {
-        SendMessage ISendMessage = new SendMessage();
-        GetMessages IGetMessages = new GetMessages();
-        ForegroundService IForegroundService = new ForegroundService();
-        SaveQueue ISaveQueue = new SaveQueue();
-
         public override void OnReceive(Context context, Intent intent)
         {
             var pendingResult = GoAsync();
@@ -52,11 +47,11 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
                         {
                             Toast.MakeText(context, "Received SMS!", ToastLength.Short).Show();
                         }, null);
-                        var messages = IGetMessages.RetriveBy(message, sender);
+                        var messages = GetMessages.RetriveBy(message, sender);
                         if (messages.Count > 0)
                         {
                             string jsonString = JsonConvert.SerializeObject(messages[0]);
-                            await ISaveQueue.SetQueueAsync(jsonString);
+                            await SaveQueue.SetQueueAsync(jsonString);
                         }
                         HtmlElement.Refresh();
                     } 

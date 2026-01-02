@@ -20,24 +20,17 @@ namespace BNet.Mobile.SMS.Services.APIService
 {
     internal class APIServer
     {
-        SendQueue ISendQueue = new SendQueue();
-
-        public void Start()
+        static HttpListener listener = new HttpListener();
+        public static void Start()
         {
             Task.Run(async () =>
             {
-                HttpListener listener = new HttpListener();
-                if (listener.IsListening)
-                {
-                    listener.Stop();
-                }
-                else
-                {
-                    listener.Prefixes.Add("http://*:8030/");
-                }
                 try
                 {
+                    listener.Prefixes.Remove("http://*:8030/");
+                    listener.Prefixes.Add("http://*:8030/");
                     listener.Start();
+
                     while (true)
                     {
                         var context = await listener.GetContextAsync();
@@ -68,7 +61,7 @@ namespace BNet.Mobile.SMS.Services.APIService
                         {
                             using var reader = new StreamReader(request.InputStream, Encoding.UTF8);
                             string body = await reader.ReadToEndAsync();
-                            await ISendQueue.SetQueueAsync(body);
+                            await SendQueue.SetQueueAsync(body);
                             response.StatusCode = 200;
                             await WriteResponse(response, "{\"status\":\"sent\"}");
                             HtmlElement.Refresh();  // Make sure this method is safe to use in an async context
@@ -80,6 +73,7 @@ namespace BNet.Mobile.SMS.Services.APIService
                         }
 
                         response.Close();
+                        await Task.Delay(100); // yield to OS
                     }
                 }
                 catch (Exception ex)
@@ -90,7 +84,7 @@ namespace BNet.Mobile.SMS.Services.APIService
             });
         }
 
-        private async Task WriteResponse(HttpListenerResponse response, string json)
+        private static async Task WriteResponse(HttpListenerResponse response, string json)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(json);
             await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);

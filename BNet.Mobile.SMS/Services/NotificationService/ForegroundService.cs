@@ -69,26 +69,23 @@ namespace BNet.Mobile.SMS.Services.NotificationService
 
 
 
-            TimeTrigger timeTrigger = new TimeTrigger(); 
+
+
+            //API Server For Client Connection
+            APIServer.Start();
             // create a timer
             Timer timer = new Timer(500); // 1000ms = 1 second
             timer.Elapsed += async (sender, e) =>
             {
                 //Service Bus Timer
-                timeTrigger.ProcessSendingMessages();
-                timeTrigger.ProcessSavingMessages();
+                TimeTrigger.ProcessSendingMessages();
+                TimeTrigger.ProcessSavingMessages();
             };
             timer.Start();
-
-
-            //API Server For Client Connection
-            APIServer aPIServer = new APIServer();
-            aPIServer.Start();
-
             return StartCommandResult.Sticky;
         }
 
-        public void StartMyForeGroundService()
+        public static void StartMyForeGroundService()
         {
             var intent = new Intent(Android.App.Application.Context, typeof(ForegroundService));
 
@@ -104,7 +101,7 @@ namespace BNet.Mobile.SMS.Services.NotificationService
             }
         }
 
-        public void StopMyForeGroundService()
+        public static void StopMyForeGroundService()
         {
             var intent = new Intent(Android.App.Application.Context, typeof(ForegroundService));
             Android.App.Application.Context.StopService(intent);

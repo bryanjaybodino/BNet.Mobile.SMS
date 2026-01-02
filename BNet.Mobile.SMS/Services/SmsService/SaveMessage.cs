@@ -19,20 +19,16 @@ namespace BNet.Mobile.SMS.Services.SmsService
 {
     internal class SaveMessage
     {
-        SaveQueue ISaveQueue = new SaveQueue();
-        NetworkChecker INetworkChecker = new NetworkChecker();
-        Properties IProperties = new Properties();
-
         static List<string> MessagesHistory = new List<string>();
-        public async void Saved()
+        public static async void Saved()
         {
             try
             {
-                if (IProperties.IsMySQLEnabled())
+                if (Properties.IsMySQLEnabled())
                 {
-                    if (INetworkChecker.HasInternet())
+                    if (NetworkChecker.HasInternet())
                     {
-                        var jsonString = await ISaveQueue.PeekAsync();
+                        var jsonString = await SaveQueue.PeekAsync();
                         var messages = JsonConvert.DeserializeObject<Messages>(jsonString);
                         List<string> data = new List<string>();
                         string query = InsertData(messages.id, messages.body, messages.date, messages.address, messages.type);
@@ -46,11 +42,11 @@ namespace BNet.Mobile.SMS.Services.SmsService
             }
             catch { }
         }
-        public int CountSave()
+        public static int CountSave()
         {
             return MessagesHistory.Count;
         }
-        private async void ExecuteInsertQuery(List<string> value)
+        private static async void ExecuteInsertQuery(List<string> value)
         {
             DBQuery_IDU dBQuery_IDU = new DBQuery_IDU();
             string data = string.Join(",", value);
@@ -58,12 +54,12 @@ namespace BNet.Mobile.SMS.Services.SmsService
             dBQuery_IDU.Command("INSERT INTO sms_table (sms_id,message,created_date,created_time,address,type) VALUES " + Query, "");
             if (dBQuery_IDU.isSuccess)
             {
-                MessagesHistory.Add(await ISaveQueue.PeekAsync());
-                await ISaveQueue.DequeueAsync();
+                MessagesHistory.Add(await SaveQueue.PeekAsync());
+                await SaveQueue.DequeueAsync();
             }
             HtmlElement.Refresh();
         }
-        private string InsertData(string id, string message, string date, string address, string type)
+        private static string InsertData(string id, string message, string date, string address, string type)
         {
             string data = "";
             try

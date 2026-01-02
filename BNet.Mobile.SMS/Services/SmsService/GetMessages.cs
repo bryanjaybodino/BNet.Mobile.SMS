@@ -14,7 +14,7 @@ namespace BNet.Mobile.SMS.Services.SmsService
 {
     internal class GetMessages
     {
-        public List<Messages> RetriveBy(string message, string contact)
+        public static List<Messages> RetriveBy(string message, string contact)
         {
 
             List<Messages> retrives = new List<Messages>();

@@ -34,25 +34,18 @@ namespace BNet.Mobile.SMS
         {
             isRefresh = true;
         }
-        static NetworkChecker networkChecker = new NetworkChecker();
-        static SendQueue ISendQueue = new SendQueue();
-        static SaveQueue ISaveQueue = new SaveQueue();
 
-
-        static SendMessage ISendMessage = new SendMessage();
-        static SaveMessage ISaveMessage = new SaveMessage();
-        static Properties IProperties = new Properties();
         public static async Task Update(ScriptContext scriptContext)
         {
             if (isRefresh)
             {
-                scriptContext.UpdateInnerText(Label_Connection, networkChecker.LocalConnection());
-                scriptContext.UpdateInnerText(Label_SentQueue, (await ISendQueue.CountAsync()).ToString());
-                scriptContext.UpdateInnerText(Label_SentSuccess, (ISendMessage.CountSent()).ToString());
-                scriptContext.UpdateInnerText(Label_SentFailed, (ISendMessage.CountFailed()).ToString());
-                scriptContext.UpdateInnerText(Label_ReceivedQueue, (await ISaveQueue.CountAsync()).ToString());
-                scriptContext.UpdateInnerText(Label_ReceivedSuccess, (ISaveMessage.CountSave()).ToString());
-                scriptContext.UpdateValue(Textbox_Connection, IProperties.DatabaseConnection());
+                scriptContext.UpdateInnerText(Label_Connection, NetworkChecker.LocalConnection());
+                scriptContext.UpdateInnerText(Label_SentQueue, (await SendQueue.CountAsync()).ToString());
+                scriptContext.UpdateInnerText(Label_SentSuccess, (SendMessage.CountSent()).ToString());
+                scriptContext.UpdateInnerText(Label_SentFailed, (SendMessage.CountFailed()).ToString());
+                scriptContext.UpdateInnerText(Label_ReceivedQueue, (await SaveQueue.CountAsync()).ToString());
+                scriptContext.UpdateInnerText(Label_ReceivedSuccess, (SaveMessage.CountSave()).ToString());
+                scriptContext.UpdateValue(Textbox_Connection, Properties.DatabaseConnection());
                 isRefresh = false;
             }
         }

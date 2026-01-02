@@ -10,25 +10,16 @@ using BNet.Mobile.SMS.Services.MyDatabase;
 using BNet.Mobile.SMS.Services.NotificationService;
 using BNet.Mobile.SMS.Services.TempData;
 using Java.Interop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
-using static Android.Renderscripts.Sampler;
-using static Android.Telephony.CarrierConfigManager;
-using static Google.Android.Material.Tabs.TabLayout;
+
 
 namespace BNet.Mobile.SMS
 {
     public class ScriptContext : Java.Lang.Object
     {
         MySQLService IMySQLService = new MySQLService();
-        Properties IProperties = new Properties();
         CreateDatabase ICreateDatabase = new CreateDatabase();
-        ForegroundService IForegroundService = new ForegroundService();
-        RecentTasksService IRecentTasksService = new RecentTasksService();
+
 
 
         private readonly Context context;
@@ -48,13 +39,13 @@ namespace BNet.Mobile.SMS
             {
                 UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
                 UpdateInnerText(HtmlElement.Label_RunService, "Start Service");
-                IForegroundService.StopMyForeGroundService();
+                ForegroundService.StopMyForeGroundService();
             }
             else
             {
                 UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
                 UpdateInnerText(HtmlElement.Label_RunService, "Service is running");
-                IForegroundService.StartMyForeGroundService();
+                ForegroundService.StartMyForeGroundService();
 
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -62,7 +53,7 @@ namespace BNet.Mobile.SMS
                 alert.SetTitle("Message");
                 alert.SetMessage("The app is closing in order to run in the background.");
                 alert.SetPositiveButton("Ok", (senderAlert, args) => {
-                    IRecentTasksService.RemoveAppFromRecentTasks();
+                    RecentTasksService.RemoveAppFromRecentTasks();
                 });
                 alert.Show();
 
@@ -80,17 +71,17 @@ namespace BNet.Mobile.SMS
             // Run the database creation task in the background
             Task.Run(async () =>
             {
-                IProperties.SetDatabaseConnection(value);
+                Properties.SetDatabaseConnection(value);
                 if (IMySQLService.isConnected())
                 {
                     await ICreateDatabase.Create();
                     ToastShort("Database has been saved!");
-                    IProperties.SetIsMySQLEnabled(true);
+                    Properties.SetIsMySQLEnabled(true);
                 }
                 else
                 {
                     ToastShort("Database is not found!");
-                    IProperties.SetIsMySQLEnabled(false);
+                    Properties.SetIsMySQLEnabled(false);
                 }
 
 

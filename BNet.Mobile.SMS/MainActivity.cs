@@ -34,7 +34,6 @@ namespace BNet.Mobile.SMS
 
         // AD HOC PASSWORD : 123456
 
-        TimeTrigger timeTrigger = new TimeTrigger();
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -54,8 +53,8 @@ namespace BNet.Mobile.SMS
             FullScreen();
 
             //API Server For Client Connection
-            APIServer aPIServer = new APIServer();
-            aPIServer.Start();
+            APIServer.Start();
+
 
             //Check Permission
             MyPermission myPermission = new MyPermission(this);
@@ -117,8 +116,8 @@ namespace BNet.Mobile.SMS
                         await HtmlElement.Update(scriptContext);
 
                         //Service Bus Timer
-                        timeTrigger.ProcessSendingMessages();
-                        timeTrigger.ProcessSavingMessages();
+                        TimeTrigger.ProcessSendingMessages();
+                        TimeTrigger.ProcessSavingMessages();
                     });
                 };
                 timer.Start();

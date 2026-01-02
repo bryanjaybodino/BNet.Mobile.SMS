@@ -19,7 +19,6 @@ namespace BNet.Mobile.SMS.Services.MyDatabase
 {
     internal class MySQLService
     {
-        Properties IProperties = new Properties();
         //server=localhost;user id=root;database=bnet_sms;Connect Timeout=2147483
         public MySqlConnection MyConnection = new MySqlConnection();
         public MySqlCommand DBCommand = new MySqlCommand();
@@ -83,7 +82,7 @@ namespace BNet.Mobile.SMS.Services.MyDatabase
 
                     if (PingIpAddress(server))
                     {
-                        using (var connection = new MySqlConnection(IProperties.DatabaseConnection()))
+                        using (var connection = new MySqlConnection(Properties.DatabaseConnection()))
                         {
                             connection.Open(); // Attempt to open the connection
                         }
@@ -101,7 +100,7 @@ namespace BNet.Mobile.SMS.Services.MyDatabase
 
                     if (IsHostActive(server, port))
                     {
-                        using (var connection = new MySqlConnection(IProperties.DatabaseConnection()))
+                        using (var connection = new MySqlConnection(Properties.DatabaseConnection()))
                         {
                             connection.Open(); // Attempt to open the connection
                         }
@@ -124,17 +123,17 @@ namespace BNet.Mobile.SMS.Services.MyDatabase
         }
         public string DatabaseName()
         {
-            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(IProperties.DatabaseConnection());
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(Properties.DatabaseConnection());
             return builder.Database;
         }
         public string ServerName()
         {
-            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(IProperties.DatabaseConnection());
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(Properties.DatabaseConnection());
             return builder.Server;
         }
         public string PortNumber()
         {
-            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(IProperties.DatabaseConnection());
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(Properties.DatabaseConnection());
             return builder.Port.ToString();
         }
         public bool DBSetCommand(string MyCommand)
@@ -165,7 +164,7 @@ namespace BNet.Mobile.SMS.Services.MyDatabase
                 {
                     if (PingIpAddress(server))
                     {
-                        MyConnection = new MySqlConnection(IProperties.DatabaseConnection());
+                        MyConnection = new MySqlConnection(Properties.DatabaseConnection());
                         MyConnection.Open();
                     }
                 }
@@ -173,7 +172,7 @@ namespace BNet.Mobile.SMS.Services.MyDatabase
                 {
                     if (IsHostActive(server, port))
                     {
-                        MyConnection = new MySqlConnection(IProperties.DatabaseConnection());
+                        MyConnection = new MySqlConnection(Properties.DatabaseConnection());
                         MyConnection.Open();
                     }
                 }

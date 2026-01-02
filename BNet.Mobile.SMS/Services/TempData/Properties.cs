@@ -15,7 +15,7 @@ namespace BNet.Mobile.SMS.Services.TempData
     internal class Properties
     {
 
-        public string DatabaseConnection()
+        public static string DatabaseConnection()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace BNet.Mobile.SMS.Services.TempData
             catch { return ""; }
 
         }
-        public bool IsMySQLEnabled()
+        public static bool IsMySQLEnabled()
         {
             try
             {
@@ -62,7 +62,7 @@ namespace BNet.Mobile.SMS.Services.TempData
             }
             catch { return false; }
         }
-        public void SetDatabaseConnection(string data)
+        public static void SetDatabaseConnection(string data)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace BNet.Mobile.SMS.Services.TempData
             }
             catch { }
         }
-        public void SetIsMySQLEnabled(bool data)
+        public static void SetIsMySQLEnabled(bool data)
         {
             try
             {

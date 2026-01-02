@@ -16,7 +16,7 @@ namespace BNet.Mobile.SMS.Services.TempData
 {
     internal class SaveQueue
     {
-        private async Task<Queue<string>> GetQueueAsync()
+        private static async Task<Queue<string>> GetQueueAsync()
         {
             var messagesList = new Queue<string>();
             try
@@ -33,7 +33,7 @@ namespace BNet.Mobile.SMS.Services.TempData
             return messagesList;
         }
 
-        private async Task SaveQueueAsync(Queue<string> messagesList)
+        private static async Task SaveQueueAsync(Queue<string> messagesList)
         {
             try
             {
@@ -45,26 +45,26 @@ namespace BNet.Mobile.SMS.Services.TempData
             }
         }
 
-        public async Task<string> PeekAsync()
+        public static async Task<string> PeekAsync()
         {
             var queue = await GetQueueAsync();
             return queue.Count > 0 ? queue.Peek() : null;
         }
 
-        public async Task<int> CountAsync()
+        public static async Task<int> CountAsync()
         {
             var queue = await GetQueueAsync();
             return queue.Count;
         }
 
-        public async Task SetQueueAsync(string message)
+        public static async Task SetQueueAsync(string message)
         {
             var queue = await GetQueueAsync();
             queue.Enqueue(message);
             await SaveQueueAsync(queue);
         }
 
-        public async Task DequeueAsync()
+        public static async Task DequeueAsync()
         {
             var queue = await GetQueueAsync();
             if (queue.Count > 0)

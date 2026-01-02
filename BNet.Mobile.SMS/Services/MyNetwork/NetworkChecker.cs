@@ -16,18 +16,18 @@ namespace BNet.Mobile.SMS.Services.MyNetwork
 {
     internal class NetworkChecker
     {
-        public int PortNumber()
+        public static int PortNumber()
         {
             return 8030;
         }
-        public string IPAddress()
+        public static string IPAddress()
         {
             WifiManager wifiMgr = (WifiManager)Android.App.Application.Context.GetSystemService(Context.WifiService);
             WifiInfo wifiInfo = wifiMgr.ConnectionInfo;
             int ip = wifiInfo.IpAddress;
             return Formatter.FormatIpAddress(ip);
         }
-        public bool HasInternet()
+        public static bool HasInternet()
         {
             bool isMobileDataEnabled = IsMobileDataEnabled(Android.App.Application.Context);
             bool isWifiEnabled = IsWifiEnabled(Android.App.Application.Context);
@@ -45,12 +45,12 @@ namespace BNet.Mobile.SMS.Services.MyNetwork
             }
         }
 
-        public string LocalConnection()
+        public static string LocalConnection()
         {
             return "http://" + IPAddress() + ":" + PortNumber();
         }
 
-        bool IsMobileDataEnabled(Context context)
+        static bool IsMobileDataEnabled(Context context)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace BNet.Mobile.SMS.Services.MyNetwork
                 return false;
             }
         }
-        bool IsWifiEnabled(Context context)
+        static bool IsWifiEnabled(Context context)
         {
             try
             {

@@ -18,11 +18,10 @@ namespace BNet.Mobile.SMS.Services.SmsService
 {
     internal class SendMessage
     {
-        SendQueue ISendQueue = new SendQueue();
         static List<string> MessagesHistory = new List<string>();
         static List<string> MessageFailed = new List<string>();
         static string tempJson = "";//Stored current message for failed message
-        public void Send(string jsonMessage)
+        public static void Send(string jsonMessage)
         {
             var SmsSender = SmsManager.Default;
             try
@@ -92,16 +91,16 @@ namespace BNet.Mobile.SMS.Services.SmsService
                 SmsSender.Dispose();
             }
         }
-        public async void Remove()
+        public static async void Remove()
         {
             try
             {
-                tempJson = await ISendQueue.PeekAsync();
-                await ISendQueue.DequeueAsync();
+                tempJson = await SendQueue.PeekAsync();
+                await SendQueue.DequeueAsync();
             }
             catch { }
         }
-        public void Failed()
+        public static void Failed()
         {
             try
             {
@@ -110,25 +109,25 @@ namespace BNet.Mobile.SMS.Services.SmsService
             }
             catch { }
         }
-        public async void Sent()
+        public static async void Sent()
         {
             try
             {
-                MessagesHistory.Add(await ISendQueue.PeekAsync());
+                MessagesHistory.Add(await SendQueue.PeekAsync());
             }
             catch { }
         }
 
-        public int CountSent()
+        public static int CountSent()
         {
             return MessagesHistory.Count;
         }
-        public int CountFailed()
+        public static int CountFailed()
         {
             return MessageFailed.Count;
         }
 
-        string RemovePHCountryCode(string phone)
+        static string RemovePHCountryCode(string phone)
         {
             phone = phone.Replace(" ", "").Trim();
             string pattern = @"^(?:\+63|63)?";

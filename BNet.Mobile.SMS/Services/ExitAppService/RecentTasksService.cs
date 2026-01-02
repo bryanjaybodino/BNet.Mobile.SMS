@@ -13,7 +13,7 @@ namespace BNet.Mobile.SMS.Services.ExitAppService
 {
     public class RecentTasksService 
     {
-        public void RemoveAppFromRecentTasks()
+        public static void RemoveAppFromRecentTasks()
         {
             // Get current activity safely
             var activity = Xamarin.Essentials.Platform.CurrentActivity;

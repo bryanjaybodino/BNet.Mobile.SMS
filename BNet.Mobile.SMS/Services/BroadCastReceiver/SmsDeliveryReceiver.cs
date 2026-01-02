@@ -20,10 +20,6 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
     [IntentFilter(new[] { "SMS_SENT" })]
     public class SmsDeliveryReceiver : BroadcastReceiver
     {
-        SendMessage ISendMessage = new SendMessage();
-        GetMessages IGetMessages = new GetMessages();
-        ForegroundService IForegroundService = new ForegroundService();
-        SaveQueue ISaveQueue = new SaveQueue();
         public override void OnReceive(Context context, Intent intent)
         {
             var pendingResult = GoAsync();
@@ -35,12 +31,12 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
                     await Task.Delay(10000);
                     string receiver = intent.GetStringExtra("receiver");
                     string message = intent.GetStringExtra("message");
-                    var messages = IGetMessages.RetriveBy(message, receiver);
+                    var messages = GetMessages.RetriveBy(message, receiver);
                     if (messages.Count > 0)
                     {
                         string jsonString = JsonConvert.SerializeObject(messages[0]);
-                        await ISaveQueue.SetQueueAsync(jsonString);
-                        ISendMessage.Sent();
+                        await SaveQueue.SetQueueAsync(jsonString);
+                        SendMessage.Sent();
                         Android.App.Application.SynchronizationContext.Post(_ =>
                         {
                             Toast.MakeText(context, "Sent SMS!", ToastLength.Short).Show();
@@ -48,7 +44,7 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
                     }
                     else
                     {
-                        ISendMessage.Failed();
+                        SendMessage.Failed();
                     }
 
                     HtmlElement.Refresh();
