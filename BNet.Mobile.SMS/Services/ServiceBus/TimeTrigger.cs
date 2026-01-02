@@ -6,7 +6,6 @@ using Android.Views;
 using Android.Widget;
 using BNet.Mobile.SMS.Services.SmsService;
 using BNet.Mobile.SMS.Services.TempData;
-using BNet.Mobile.SMS.Services.Websocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,19 +20,15 @@ namespace BNet.Mobile.SMS.Services.ServiceBus
         SendMessage ISendMessage = new SendMessage();
         SaveMessage ISaveMessage = new SaveMessage();
 
-        int TimeInterval = 1;
+        int TimeInterval = 5;
         int Send_TimerTrigger = 0;
         int Save_TimerTrigger = 0;
-
-        bool isRunning = true;
-        //static ClientSocketConnection clientSocketConnection = new ClientSocketConnection();
-        static ServerSocketConnection serverSocketConnection = new ServerSocketConnection();
         public async void ProcessSendingMessages()
         {
             int countSent = await ISendQueue.CountAsync();
             if (countSent > 0)
             {
-                if (Send_TimerTrigger >= TimeInterval)
+                if (Send_TimerTrigger >= (TimeInterval * 2))
                 {
                     Send_TimerTrigger = 0;
                     string Message = await ISendQueue.PeekAsync();
@@ -51,10 +46,10 @@ namespace BNet.Mobile.SMS.Services.ServiceBus
             int countSave = await ISaveQueue.CountAsync();
             if (countSave > 0)
             {
-                if (Save_TimerTrigger >= TimeInterval)
+                if (Save_TimerTrigger >= (TimeInterval * 2))
                 {
                     Save_TimerTrigger = 0;
-                    //ISaveMessage.Saved();
+                    ISaveMessage.Saved();
                 }
                 else
                 {

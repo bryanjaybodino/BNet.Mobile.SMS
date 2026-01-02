@@ -29,26 +29,37 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
             var pendingResult = GoAsync();
             Task.Run(async () =>
             {
-                // Wait 5 seconds to reflect on the SIM card database
-                await Task.Delay(5000);
-                string sender = intent.Identifier.Split('¿')[0];
-                string message = intent.Identifier.Split('¿')[1];
-                var messages = IGetMessages.RetriveBy(message, sender);
-                if (messages.Count > 0)
+                try
                 {
-                    string jsonString = JsonConvert.SerializeObject(messages[0]);
-                    await ISaveQueue.SetQueueAsync(jsonString); ISendMessage.Sent();
-                    Android.App.Application.SynchronizationContext.Post(_ =>
+                    // Wait 5 seconds to reflect on the SIM card database
+                    await Task.Delay(10000);
+                    string receiver = intent.GetStringExtra("receiver");
+                    string message = intent.GetStringExtra("message");
+                    var messages = IGetMessages.RetriveBy(message, receiver);
+                    if (messages.Count > 0)
                     {
-                        Toast.MakeText(context, "Sent SMS!", ToastLength.Short).Show();
-                    }, null);
+                        string jsonString = JsonConvert.SerializeObject(messages[0]);
+                        await ISaveQueue.SetQueueAsync(jsonString);
+                        ISendMessage.Sent();
+                        Android.App.Application.SynchronizationContext.Post(_ =>
+                        {
+                            Toast.MakeText(context, "Sent SMS!", ToastLength.Short).Show();
+                        }, null);
+                    }
+                    else
+                    {
+                        ISendMessage.Failed();
+                    }
+
+                    HtmlElement.Refresh();
                 }
-                else
+                finally
                 {
-                    ISendMessage.Failed();
+                    pendingResult.Finish();
                 }
-                pendingResult.Finish();
+
             });
+
         }
     }
 }

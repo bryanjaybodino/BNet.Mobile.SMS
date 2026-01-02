@@ -5,8 +5,8 @@ using Android.Runtime;
 using Android.Telephony;
 using Android.Views;
 using Android.Widget;
+using BNet.Mobile.SMS.Services.APIService.Models;
 using BNet.Mobile.SMS.Services.TempData;
-using BNet.Mobile.SMS.Services.Websocket.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -44,14 +44,27 @@ namespace BNet.Mobile.SMS.Services.SmsService
                             //NEED I REMOVE AGAD YUNG MESSAGE PARA HINDI NA MAG DUPLICATE 
                             //NASA SmsReceiver yung Next Action kung Failed() or Sent()
                             Remove();// NEED NA AGAD I REMOVE KASI PAG MAHABA ANG MESSAGE NAG KAKA ERROR NA
+                                     // SENT intent
+
+
 
                             IList<string> messages = SmsSender.DivideMessage(message);
-                            IList<PendingIntent> pendingIntents_deliver = new List<PendingIntent>();
-                            Intent SmsDeliverAction = new Intent("SMS_SENT");
-                            SmsDeliverAction.SetIdentifier(receiver + "¿" + message);
-                            PendingIntent deliver = PendingIntent.GetBroadcast(Android.App.Application.Context, 0, SmsDeliverAction, PendingIntentFlags.Immutable);
-                            pendingIntents_deliver.Add(deliver);
-                            SmsSender.SendMultipartTextMessage(receiver, null, messages, pendingIntents_deliver, null);
+                            IList<PendingIntent> sentIntents = new List<PendingIntent>();
+                            IList<PendingIntent> deliveredIntents = new List<PendingIntent>();
+
+
+                            Intent sentIntent = new Intent("SMS_SENT");
+                            sentIntent.PutExtra("receiver", receiver);
+                            sentIntent.PutExtra("message", message);
+                            PendingIntent sentPending = PendingIntent.GetBroadcast(
+                                Android.App.Application.Context,
+                                i, // unique per part
+                                sentIntent,
+                                PendingIntentFlags.Immutable
+                            );
+                            sentIntents.Add(sentPending);
+                            // Send the SMS
+                            SmsSender.SendMultipartTextMessage(receiver, null, messages, sentIntents, null);
                         }
                         else
                         {

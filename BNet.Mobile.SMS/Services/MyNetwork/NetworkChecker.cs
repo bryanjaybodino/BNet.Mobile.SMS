@@ -47,7 +47,7 @@ namespace BNet.Mobile.SMS.Services.MyNetwork
 
         public string LocalConnection()
         {
-            return "ws://" + IPAddress() + ":" + PortNumber();
+            return "http://" + IPAddress() + ":" + PortNumber();
         }
 
         bool IsMobileDataEnabled(Context context)

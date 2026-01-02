@@ -26,8 +26,8 @@
         <div class="d-flex justify-content-between mb-3">
             <div>
                 <h2 class="fw-bold text-primary mb-1">SMS Integration</h2>
-                <div class="fw-bold text-muted">Websocket Connection: </div>
-                <small id="Label_Connection" class="text-muted">ws://0.0.0.0:8030</small>
+                <span class="fw-bold text-muted">API Connection : </span>
+                <small id="Label_Connection" class="text-muted">http://0.0.0.0:8030</small>
             </div>
             <div class="text-end px-2">
                 <i class="fs-3" id="themeToggle" style="cursor:pointer;"></i>
@@ -55,10 +55,10 @@
             <div class="card-body bg-secondary text-white">
                 <h6 class="fw-bold mb-2">No Database Found</h6>
                 <div class="d-flex justify-content-between">
-                    <span>Queue</span><span>0</span>
+                    <span>Queue</span><span id="Label_ReceivedQueue">0</span>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <span>Success</span><span>0</span>
+                    <span>Success</span><span id="Label_ReceivedSuccess">0</span>
                 </div>
             </div>
         </div>
@@ -129,28 +129,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Tabs for WebSocket and Database settings -->
+                    <!-- Settings Buttons -->
                     <ul class="nav nav-tabs" id="settingsTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="websocket-tab" data-bs-toggle="tab" href="#websocket" role="tab" aria-controls="websocket" aria-selected="true">WebSocket</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="database-tab" data-bs-toggle="tab" href="#database" role="tab" aria-controls="database" aria-selected="false">Database</a>
+                            <a class="nav-link active" id="database-tab" data-bs-toggle="tab" href="#database" role="tab" aria-controls="database" aria-selected="false">Database Connection</a>
                         </li>
                     </ul>
-                    <div class="tab-content mt-3" id="settingsTabContent">
-                        <!-- WebSocket Tab -->
-                        <div class="tab-pane fade show active" id="websocket" role="tabpanel" aria-labelledby="websocket-tab">
-                            <div class="mb-3">
-                                <label for="websocket-url" class="form-label">WebSocket URL</label>
-                                <input type="text" class="form-control" id="websocket-url" value="ws://0.0.0.0:8030">
-                            </div>
-                        </div>
+                    <div class="tab-content mt-1" id="settingsTabContent">
                         <!-- Database Tab -->
-                        <div class="tab-pane fade" id="database" role="tabpanel" aria-labelledby="database-tab">
+                        <div class="tab-pane fade show active" id="database" role="tabpanel" aria-labelledby="database-tab">
                             <div class="mb-3">
-                                <label for="database-status" class="form-label">Database Status</label>
-                                <textarea class="form-control" id="database-connection" rows="4">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</textarea>
+                                <textarea class="form-control" id="Textbox_Connection" rows="10">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</textarea>
                             </div>
                         </div>
                     </div>
@@ -205,16 +194,9 @@
             const activeTab = document.querySelector('.nav-link.active'); // Get the currently active tab
             const activeTabId = activeTab ? activeTab.id : null;
 
-            if (activeTabId === 'websocket-tab') {
-                // Handle WebSocket settings saving (if any action is required)
-                console.log('Saving WebSocket settings');
-                // For example, you could add logic to get the WebSocket URL and process it
-                var websocketUrl = document.getElementById('websocket-url').value;
-                window.ScriptContext.CreateWebSocket(websocketUrl); // Assuming you have such a method
-            }
-            else if (activeTabId === 'database-tab') {
+            if (activeTabId === 'database-tab') {
                 // Get the value and remove any newlines (line breaks)
-                var connectionString = document.getElementById('database-connection').value.replace(/(\r\n|\n|\r)/gm, "");
+                var connectionString = document.getElementById('Textbox_Connection').value.replace(/(\r\n|\n|\r)/gm, "");
                 // Send the cleaned string
                 window.ScriptContext.CreateDatabase(connectionString);
             }

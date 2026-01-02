@@ -11,16 +11,18 @@ using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using AndroidX.LocalBroadcastManager.Content;
+using BNet.Mobile.SMS.Services.APIService;
 using BNet.Mobile.SMS.Services.BroadCastReceiver;
 using BNet.Mobile.SMS.Services.MyNetwork;
+using BNet.Mobile.SMS.Services.PermissionService;
 using BNet.Mobile.SMS.Services.ServiceBus;
 using BNet.Mobile.SMS.Services.SmsService;
 using BNet.Mobile.SMS.Services.TempData;
-using BNet.Mobile.SMS.Services.Websocket;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using static Android.Bluetooth.BluetoothClass;
 using static Google.Android.Material.Tabs.TabLayout;
 
 namespace BNet.Mobile.SMS
@@ -31,108 +33,61 @@ namespace BNet.Mobile.SMS
 
         // AD HOC PASSWORD : 123456
 
-        const int RequestSmsPermissionsId = 101;
-
-        readonly string[] SmsPermissions =
-        {
-            Manifest.Permission.ReadSms,
-            Manifest.Permission.ReceiveSms,
-            Manifest.Permission.SendSms,
-            "android.permission.POST_NOTIFICATIONS" // Optional: For Android 13+ notifications
-        };
-
-
-
-        NetworkChecker networkChecker = new NetworkChecker();
-        ServerSocketConnection serverSocketConnection = new ServerSocketConnection();
-        SendQueue ISendQueue = new SendQueue();
-        SendMessage ISendMessage = new SendMessage();
         TimeTrigger timeTrigger = new TimeTrigger();
-
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
+            //REGISTER CUSTOM BROADCAST RECEIVER
+            SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
+            IntentFilter filter = new IntentFilter();
+            filter.AddAction("SMS_SENT");
+            RegisterReceiver(receiver, filter);
+
+
             // Copy the HTML file from assets to internal storage
             CopyAssetsToInternalStorage();
+
+            //Full Screen Application
             FullScreen();
+
+            //API Server For Client Connection
+            APIServer aPIServer = new APIServer();
+            aPIServer.Start();
+
+            //Check Permission
+            MyPermission myPermission = new MyPermission(this);
+            myPermission.EnsurePermissions();
+
+
+
+            //Run Webvview
             var webView = FindViewById<WebView>(Resource.Id.webview);
-            // Enable JavaScript in WebView
-            webView.Settings.JavaScriptEnabled = true;
-            webView.Settings.DomStorageEnabled = true;  // Enable local storage if used
-            webView.Settings.AllowUniversalAccessFromFileURLs = true;  // Allow access to files from file URLs
-            webView.Settings.AllowFileAccessFromFileURLs = true;  // Allow file access from file URLs
-            webView.Settings.AllowContentAccess = true;  // Allow access to content
+            webView.Settings.JavaScriptEnabled = true;                      // Enable JavaScript in WebView
+            webView.Settings.DomStorageEnabled = true;                      // Enable local storage if used
+            webView.Settings.AllowUniversalAccessFromFileURLs = true;       // Allow access to files from file URLs
+            webView.Settings.AllowFileAccessFromFileURLs = true;            // Allow file access from file URLs
+            webView.Settings.AllowContentAccess = true;                     // Allow access to content
             var scriptContext = new ScriptContext(this, webView);
             webView.AddJavascriptInterface(scriptContext, "ScriptContext");
-            WebView.SetWebContentsDebuggingEnabled(true);// Enable debugging (Logcat or Chrome DevTools)
-            webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html");
-            SupportActionBar?.Hide();
-            await StartTimer(scriptContext);
-
-            // ✅ Check and request permissions at runtime
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
-            {
-                if (!HasSmsPermissions())
-                {
-                    RequestPermissions(SmsPermissions, RequestSmsPermissionsId);
-                }
-            }
+            WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
+            webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
 
 
-
-            SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
-            IntentFilter filter = new IntentFilter("SMS_SENT");
-            RegisterReceiver(receiver, filter);
+            StartTimer(scriptContext);
         }
 
 
-        private async Task StartTimer(ScriptContext scriptContext)
-        {
-            async Task Refresh()
-            {
-                serverSocketConnection.Create();
-                scriptContext.UpdateInnerText(HtmlElement.Label_Connection, networkChecker.LocalConnection());
-                scriptContext.UpdateInnerText(HtmlElement.Label_SentQueue, (await ISendQueue.CountAsync()).ToString());
-                scriptContext.UpdateInnerText(HtmlElement.Label_SentSuccess, (ISendMessage.CountSent()).ToString());
-                scriptContext.UpdateInnerText(HtmlElement.Label_SentFailed, (ISendMessage.CountFailed()).ToString());
-                timeTrigger.ProcessSendingMessages();
-                timeTrigger.ProcessSavingMessages();
-            }
-            await Refresh();
-            // create a timer
-            Timer timer = new Timer(1000); // 1000ms = 1 second
-            timer.Elapsed += async (sender, e) =>
-            {
-                // Switch to UI thread
-                RunOnUiThread(async () =>
-                {
-                    await Refresh();
-                });
-            };
-            timer.Start();
-        }
 
-
-        // ✅ Helper: Check if permissions are already granted
-        bool HasSmsPermissions()
-        {
-            foreach (var permission in SmsPermissions)
-            {
-                if (CheckSelfPermission(permission) != Permission.Granted)
-                    return false;
-            }
-            return true;
-        }
 
         // ✅ Handle the user's permission response
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-            if (requestCode == RequestSmsPermissionsId)
+            if (requestCode == 1001)
             {
                 if (grantResults.All(result => result == Permission.Granted))
                 {
@@ -145,6 +100,29 @@ namespace BNet.Mobile.SMS
             }
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        private async void StartTimer(ScriptContext scriptContext)
+        {
+            await Task.Run(() =>
+            {    
+                // create a timer
+                Timer timer = new Timer(500); // 1000ms = 1 second
+                timer.Elapsed += async (sender, e) =>
+                {
+                    // Switch to UI thread
+                    RunOnUiThread(async () =>
+                    {
+                        await HtmlElement.Update(scriptContext);
+
+                        //Service Bus Timer
+                        timeTrigger.ProcessSendingMessages();
+                        timeTrigger.ProcessSavingMessages();
+                    });
+                };
+                timer.Start();
+
+            });
         }
 
 
@@ -196,6 +174,7 @@ namespace BNet.Mobile.SMS
             var decorView = Window.DecorView;
             int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
             decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+            SupportActionBar?.Hide();
         }
 
     }

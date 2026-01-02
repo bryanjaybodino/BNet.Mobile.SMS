@@ -4,7 +4,9 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using BNet.Mobile.SMS.Services.MyDatabase;
 using BNet.Mobile.SMS.Services.MyNetwork;
+using BNet.Mobile.SMS.Services.SmsService.Models;
 using BNet.Mobile.SMS.Services.TempData;
 using Java.Lang;
 using Newtonsoft.Json;
@@ -19,30 +21,30 @@ namespace BNet.Mobile.SMS.Services.SmsService
     {
         SaveQueue ISaveQueue = new SaveQueue();
         NetworkChecker INetworkChecker = new NetworkChecker();
-        //Properties IProperties = new Properties();
+        Properties IProperties = new Properties();
 
         static List<string> MessagesHistory = new List<string>();
         public async void Saved()
         {
-            //try
-            //{
-            //    if (IProperties.IsMySQLEnabled())
-            //    {
-            //        if (INetworkChecker.HasInternet())
-            //        {
-            //            var jsonString = await ISaveQueue.PeekAsync();
-            //            var messages = JsonConvert.DeserializeObject<Messages>(jsonString);
-            //            List<string> data = new List<string>();
-            //            string query = InsertData(messages.id, messages.body, messages.date, messages.address, messages.type);
-            //            if (query != "")
-            //            {
-            //                data.Add(query);
-            //            }
-            //            ExecuteInsertQuery(data);
-            //        }
-            //    }
-            //}
-            //catch { }
+            try
+            {
+                if (IProperties.IsMySQLEnabled())
+                {
+                    if (INetworkChecker.HasInternet())
+                    {
+                        var jsonString = await ISaveQueue.PeekAsync();
+                        var messages = JsonConvert.DeserializeObject<Messages>(jsonString);
+                        List<string> data = new List<string>();
+                        string query = InsertData(messages.id, messages.body, messages.date, messages.address, messages.type);
+                        if (query != "")
+                        {
+                            data.Add(query);
+                        }
+                        ExecuteInsertQuery(data);
+                    }
+                }
+            }
+            catch { }
         }
         public int CountSave()
         {
@@ -50,15 +52,16 @@ namespace BNet.Mobile.SMS.Services.SmsService
         }
         private async void ExecuteInsertQuery(List<string> value)
         {
-            //DBQuery_IDU dBQuery_IDU = new DBQuery_IDU();
-            //string data = string.Join(",", value);
-            //string Query = data.TrimStart(',', ' ').TrimEnd(',', ' ');
-            //dBQuery_IDU.Command("INSERT INTO sms_table (sms_id,message,created_date,created_time,address,type) VALUES " + Query, "");
-            //if (dBQuery_IDU.isSuccess)
-            //{
-            //    MessagesHistory.Add(await ISaveQueue.PeekAsync());
-            //    await ISaveQueue.DequeueAsync();
-            //}
+            DBQuery_IDU dBQuery_IDU = new DBQuery_IDU();
+            string data = string.Join(",", value);
+            string Query = data.TrimStart(',', ' ').TrimEnd(',', ' ');
+            dBQuery_IDU.Command("INSERT INTO sms_table (sms_id,message,created_date,created_time,address,type) VALUES " + Query, "");
+            if (dBQuery_IDU.isSuccess)
+            {
+                MessagesHistory.Add(await ISaveQueue.PeekAsync());
+                await ISaveQueue.DequeueAsync();
+            }
+            HtmlElement.Refresh();
         }
         private string InsertData(string id, string message, string date, string address, string type)
         {

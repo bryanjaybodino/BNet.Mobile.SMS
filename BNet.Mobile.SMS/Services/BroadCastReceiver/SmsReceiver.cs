@@ -32,35 +32,40 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiver
             var pendingResult = GoAsync();
             Task.Run(async () =>
             {
-                string message = "";
-                string sender = "";
-
-                Bundle bundle = intent.Extras;
-                if (bundle != null)
-                {
-                    SmsMessage[] msgs = Telephony.Sms.Intents.GetMessagesFromIntent(intent);
-                    var smstext = new StringBuilder();
-
-                    foreach (var msg in msgs)
+                try
+                {          
+                    Bundle bundle = intent.Extras;
+                    if (bundle != null)
                     {
-                        smstext.Append(msg.DisplayMessageBody);
-                    }
+                        SmsMessage[] msgs = Telephony.Sms.Intents.GetMessagesFromIntent(intent);
+                        var smstext = new StringBuilder();
 
-                    message = smstext.ToString();
-                    sender = msgs.Length > 0 ? msgs[0].OriginatingAddress : string.Empty;
+                        foreach (var msg in msgs)
+                        {
+                            smstext.Append(msg.DisplayMessageBody);
+                        }
+
+                        string message = smstext.ToString();
+                        string sender = msgs.Length > 0 ? msgs[0].OriginatingAddress : string.Empty;
+
+                        Android.App.Application.SynchronizationContext.Post(_ =>
+                        {
+                            Toast.MakeText(context, "Received SMS!", ToastLength.Short).Show();
+                        }, null);
+                        var messages = IGetMessages.RetriveBy(message, sender);
+                        if (messages.Count > 0)
+                        {
+                            string jsonString = JsonConvert.SerializeObject(messages[0]);
+                            await ISaveQueue.SetQueueAsync(jsonString);
+                        }
+                        HtmlElement.Refresh();
+                    } 
                 }
-
-                Android.App.Application.SynchronizationContext.Post(_ =>
+                finally
                 {
-                    Toast.MakeText(context, "Received SMS!", ToastLength.Short).Show();
-                }, null);
-                var messages = IGetMessages.RetriveBy(message, sender);
-                if (messages.Count > 0)
-                {
-                    string jsonString = JsonConvert.SerializeObject(messages[0]);
-                    await ISaveQueue.SetQueueAsync(jsonString);
+                    pendingResult.Finish();
                 }
             });
-        } 
+        }
     }
 }

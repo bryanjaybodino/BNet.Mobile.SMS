@@ -69,11 +69,12 @@ namespace BNet.Mobile.SMS
                 {
                     await ICreateDatabase.Create();
                     ToastShort("Database has been saved!");
+                    IProperties.SetIsMySQLEnabled(true);
                 }
                 else
                 {
-
                     ToastShort("Database is not found!");
+                    IProperties.SetIsMySQLEnabled(false);
                 }
 
 
@@ -141,9 +142,13 @@ namespace BNet.Mobile.SMS
             // Ensure we're on UI thread
             webView.Post(() =>
             {
-                value = value.Replace("'", "\\'");
-                string js = $"document.getElementById('{id}').value = '{value}';";
-                webView.EvaluateJavascript(js, null);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    value = value.Replace("'", "\\'");
+                    string js = $"document.getElementById('{id}').value = '{value}';";
+                    webView.EvaluateJavascript(js, null);
+                }
+
             });
         }
         public void UpdateInnerText(string id, string value)
@@ -151,9 +156,12 @@ namespace BNet.Mobile.SMS
             // Ensure we're on UI thread
             webView.Post(() =>
             {
-                value = value.Replace("'", "\\'");
-                string js = $"document.getElementById('{id}').innerText = '{value}';";
-                webView.EvaluateJavascript(js, null);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    value = value.Replace("'", "\\'");
+                    string js = $"document.getElementById('{id}').innerText = '{value}';";
+                    webView.EvaluateJavascript(js, null);
+                }
             });
         }
         public void UpdateInnerHtml(string id, string value)
@@ -161,9 +169,12 @@ namespace BNet.Mobile.SMS
             // Ensure we're on UI thread
             webView.Post(() =>
             {
-                value = value.Replace("'", "\\'");
-                string js = $"document.getElementById('{id}').innerHtml = '{value}';";
-                webView.EvaluateJavascript(js, null);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    value = value.Replace("'", "\\'");
+                    string js = $"document.getElementById('{id}').innerHtml = '{value}';";
+                    webView.EvaluateJavascript(js, null);
+                }
             });
         }
 
@@ -172,9 +183,12 @@ namespace BNet.Mobile.SMS
             // Ensure we're on the UI thread
             webView.Post(() =>
             {
-                value = value.Replace("'", "\\'"); // Escape single quotes in the value
-                string js = $"document.getElementById('{id}').setAttribute('{attribute}', '{value}');";
-                webView.EvaluateJavascript(js, null);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    value = value.Replace("'", "\\'"); // Escape single quotes in the value
+                    string js = $"document.getElementById('{id}').setAttribute('{attribute}', '{value}');";
+                    webView.EvaluateJavascript(js, null);
+                }
             });
         }
 
@@ -184,8 +198,11 @@ namespace BNet.Mobile.SMS
             // Ensure we're on the UI thread
             webView.Post(() =>
             {
-                string js = $"document.getElementById('{id}').removeAttribute('{attribute}');";
-                webView.EvaluateJavascript(js, null);
+                if (!string.IsNullOrEmpty(attribute))
+                {
+                    string js = $"document.getElementById('{id}').removeAttribute('{attribute}');";
+                    webView.EvaluateJavascript(js, null);
+                }
             });
         }
 

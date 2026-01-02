@@ -14,27 +14,7 @@ namespace BNet.Mobile.SMS.Services.TempData
 {
     internal class Properties
     {
-        public string CustomWebsocketUrl()
-        {
-            try
-            {
-                if (SecureStorage.GetAsync("CustomWebsocketUrl") != null)
-                {
-                    using (var data = SecureStorage.GetAsync("CustomWebsocketUrl"))
-                    {
-                        data.Wait();
-                        return data.Result;
 
-                    }
-                }
-                else
-                {
-                    return "";
-                }
-            }
-            catch { return ""; }
-
-        }
         public string DatabaseConnection()
         {
             try
@@ -82,14 +62,6 @@ namespace BNet.Mobile.SMS.Services.TempData
             }
             catch { return false; }
         }
-        public void SetCustomWebsocketUrl(string data)
-        {
-            try
-            {
-                SecureStorage.SetAsync("CustomWebsocketUrl", data);
-            }
-            catch { }
-        }
         public void SetDatabaseConnection(string data)
         {
             try
@@ -98,11 +70,11 @@ namespace BNet.Mobile.SMS.Services.TempData
             }
             catch { }
         }
-        public void SetIsMySQLEnabled(string data)
+        public void SetIsMySQLEnabled(bool data)
         {
             try
             {
-                SecureStorage.SetAsync("IsMySQLEnabled", data);
+                SecureStorage.SetAsync("IsMySQLEnabled", data.ToString());
             }
             catch { }
         }
