@@ -21,65 +21,79 @@ namespace BNet.Mobile.SMS.Services.APIService
     internal class APIServer
     {
         SendQueue ISendQueue = new SendQueue();
-        SaveQueue ISaveQueue = new SaveQueue();
 
         public void Start()
         {
             Task.Run(async () =>
             {
                 HttpListener listener = new HttpListener();
-                listener.Prefixes.Add("http://*:8030/");
-                listener.Start();
-
-                while (true)
+                if (listener.IsListening)
                 {
-                    var context = listener.GetContext();
-                    var request = context.Request;
-                    var response = context.Response;
-
-                    response.ContentType = "application/json";
-
-                    // CORS
-                    response.Headers.Add("Access-Control-Allow-Origin", "*");
-                    response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-                    response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-
-                    // Preflight
-                    if (request.HttpMethod == "OPTIONS")
+                    listener.Stop();
+                }
+                else
+                {
+                    listener.Prefixes.Add("http://*:8030/");
+                }
+                try
+                {
+                    listener.Start();
+                    while (true)
                     {
-                        response.StatusCode = 200;
+                        var context = await listener.GetContextAsync();
+                        var request = context.Request;
+                        var response = context.Response;
+
+                        response.ContentType = "application/json";
+
+                        // CORS
+                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                        response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+
+                        // Preflight
+                        if (request.HttpMethod == "OPTIONS")
+                        {
+                            response.StatusCode = 200;
+                            response.Close();
+                            continue;
+                        }
+
+                        if (request.HttpMethod == "GET" && request.Url.AbsolutePath == "/status")
+                        {
+                            response.StatusCode = 200;
+                            await WriteResponse(response, "{\"status\":\"alive\"}");
+                        }
+                        else if (request.HttpMethod == "POST" && request.Url.AbsolutePath == "/send")
+                        {
+                            using var reader = new StreamReader(request.InputStream, Encoding.UTF8);
+                            string body = await reader.ReadToEndAsync();
+                            await ISendQueue.SetQueueAsync(body);
+                            response.StatusCode = 200;
+                            await WriteResponse(response, "{\"status\":\"sent\"}");
+                            HtmlElement.Refresh();  // Make sure this method is safe to use in an async context
+                        }
+                        else
+                        {
+                            response.StatusCode = 404;
+                            await WriteResponse(response, "{\"error\":\"Not Found\"}");
+                        }
+
                         response.Close();
-                        continue;
                     }
-
-                    if (request.HttpMethod == "GET" && request.Url.AbsolutePath == "/status")
-                    {
-                        response.StatusCode = 200;
-                        WriteResponse(response, "{\"status\":\"alive\"}");
-                    }
-                    else if (request.HttpMethod == "POST" && request.Url.AbsolutePath == "/send")
-                    {
-                        using var reader = new StreamReader(request.InputStream, Encoding.UTF8);
-                        string body = reader.ReadToEnd();
-                        await ISendQueue.SetQueueAsync(body);
-                        response.StatusCode = 200;
-                        WriteResponse(response, "{\"status\":\"sent\"}");
-                        HtmlElement.Refresh();
-                    }
-                    else
-                    {
-                        response.StatusCode = 404;
-                        WriteResponse(response, "{\"error\":\"Not Found\"}");
-                    }
-
-                    response.Close();
+                }
+                catch (Exception ex)
+                {
+                    // Log the error to debug if needed
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
             });
         }
-        private void WriteResponse(HttpListenerResponse response, string json)
+
+        private async Task WriteResponse(HttpListenerResponse response, string json)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(json);
-            response.OutputStream.Write(buffer, 0, buffer.Length);
+            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
         }
     }
 }

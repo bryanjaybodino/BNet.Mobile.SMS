@@ -75,11 +75,13 @@
     <Compile Include="Services\APIService\Models\SendPayload.cs" />
     <Compile Include="Services\BroadCastReceiver\SmsDeliveryReceiver.cs" />
     <Compile Include="Services\BroadCastReceiver\SmsReceiver.cs" />
+    <Compile Include="Services\ExitAppService\RecentTasksService.cs" />
     <Compile Include="Services\MyDatabase\CreateDatabase.cs" />
     <Compile Include="Services\MyDatabase\DBQuery_IDU.cs" />
     <Compile Include="Services\MyDatabase\DBSelectValue.cs" />
     <Compile Include="Services\MyDatabase\MySQLService.cs" />
     <Compile Include="Services\MyNetwork\NetworkChecker.cs" />
+    <Compile Include="Services\NotificationService\ForegroundService.cs" />
     <Compile Include="Services\PermissionService\MyPermission.cs" />
     <Compile Include="Services\ServiceBus\TimeTrigger.cs" />
     <Compile Include="Services\SmsService\GetMessages.cs" />
@@ -124,9 +126,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_foreground.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\drawable\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="MySqlConnector">
       <Version>2.5.0</Version>
@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
+    <AndroidResource Include="Resources\drawable\icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -5,7 +5,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
+using BNet.Mobile.SMS.Services.ExitAppService;
 using BNet.Mobile.SMS.Services.MyDatabase;
+using BNet.Mobile.SMS.Services.NotificationService;
 using BNet.Mobile.SMS.Services.TempData;
 using Java.Interop;
 using System;
@@ -25,7 +27,8 @@ namespace BNet.Mobile.SMS
         MySQLService IMySQLService = new MySQLService();
         Properties IProperties = new Properties();
         CreateDatabase ICreateDatabase = new CreateDatabase();
-
+        ForegroundService IForegroundService = new ForegroundService();
+        RecentTasksService IRecentTasksService = new RecentTasksService();
 
 
         private readonly Context context;
@@ -45,11 +48,24 @@ namespace BNet.Mobile.SMS
             {
                 UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
                 UpdateInnerText(HtmlElement.Label_RunService, "Start Service");
+                IForegroundService.StopMyForeGroundService();
             }
             else
             {
                 UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
                 UpdateInnerText(HtmlElement.Label_RunService, "Service is running");
+                IForegroundService.StartMyForeGroundService();
+
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.SetCancelable(false);
+                alert.SetTitle("Message");
+                alert.SetMessage("The app is closing in order to run in the background.");
+                alert.SetPositiveButton("Ok", (senderAlert, args) => {
+                    IRecentTasksService.RemoveAppFromRecentTasks();
+                });
+                alert.Show();
+
 
             }
         }

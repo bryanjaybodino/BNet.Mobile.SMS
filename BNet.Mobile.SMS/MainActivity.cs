@@ -14,6 +14,7 @@ using AndroidX.LocalBroadcastManager.Content;
 using BNet.Mobile.SMS.Services.APIService;
 using BNet.Mobile.SMS.Services.BroadCastReceiver;
 using BNet.Mobile.SMS.Services.MyNetwork;
+using BNet.Mobile.SMS.Services.NotificationService;
 using BNet.Mobile.SMS.Services.PermissionService;
 using BNet.Mobile.SMS.Services.ServiceBus;
 using BNet.Mobile.SMS.Services.SmsService;
@@ -46,7 +47,6 @@ namespace BNet.Mobile.SMS
             filter.AddAction("SMS_SENT");
             RegisterReceiver(receiver, filter);
 
-
             // Copy the HTML file from assets to internal storage
             CopyAssetsToInternalStorage();
 
@@ -77,6 +77,7 @@ namespace BNet.Mobile.SMS
 
 
             StartTimer(scriptContext);
+
         }
 
 
@@ -105,7 +106,7 @@ namespace BNet.Mobile.SMS
         private async void StartTimer(ScriptContext scriptContext)
         {
             await Task.Run(() =>
-            {    
+            {
                 // create a timer
                 Timer timer = new Timer(500); // 1000ms = 1 second
                 timer.Elapsed += async (sender, e) =>

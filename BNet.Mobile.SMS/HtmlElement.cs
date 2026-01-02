@@ -5,6 +5,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using BNet.Mobile.SMS.Services.MyNetwork;
+using BNet.Mobile.SMS.Services.NotificationService;
 using BNet.Mobile.SMS.Services.SmsService;
 using BNet.Mobile.SMS.Services.TempData;
 using System;
@@ -33,7 +34,6 @@ namespace BNet.Mobile.SMS
         {
             isRefresh = true;
         }
-
         static NetworkChecker networkChecker = new NetworkChecker();
         static SendQueue ISendQueue = new SendQueue();
         static SaveQueue ISaveQueue = new SaveQueue();
