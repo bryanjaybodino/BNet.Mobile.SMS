@@ -4,7 +4,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.HttpListenerServices.Models;
+using BNet.Mobile.SMS.Services.HttpServices.Models;
 using BNet.Mobile.SMS.Services.NetworkServices;
 using BNet.Mobile.SMS.Services.SmsServices;
 using BNet.Mobile.SMS.Services.TempDataServices;
@@ -17,7 +17,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BNet.Mobile.SMS.Services.HttpListenerServices
+namespace BNet.Mobile.SMS.Services.HttpServices
 {
     public class WebServer
     {

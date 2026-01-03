@@ -7,7 +7,7 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.Core.App;
 using BNet.Mobile.SMS.Services.FloatingServices;
-using BNet.Mobile.SMS.Services.HttpListenerServices;
+using BNet.Mobile.SMS.Services.HttpServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
 using BNet.Mobile.SMS.Services.TempDataServices;
 using System;
@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using static Android.OS.PowerManager;
 
 
 namespace BNet.Mobile.SMS.Services.ForegroundServices
@@ -32,18 +33,18 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
 
         public override StartCommandResult OnStartCommand(Intent intent, [GeneratedEnum] StartCommandFlags flags, int startId)
         {
-
-
             string channelId = "ForeGroundServiceChannel";
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
 
             // ✅ Create notification channel only on Android 8.0+
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(channelId, "Foreground Service Channel", NotificationImportance.Min)
+                var channel = new NotificationChannel(channelId, "Foreground Service Channel", NotificationImportance.Max)
                 {
-                    LockscreenVisibility = NotificationVisibility.Private
+                    LockscreenVisibility = NotificationVisibility.Private,
                 };
+
+                channel.SetShowBadge(false);
                 notificationManager.CreateNotificationChannel(channel);
             }
 
@@ -72,8 +73,6 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
 
             var notification = notificationBuilder.Build();
             StartForeground(1002, notification);
-
-            //();
             return StartCommandResult.Sticky;
         }
 
@@ -91,35 +90,17 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
             Properties.SetIsBackgroundService(false);
 
         }
-
-        PowerManager.WakeLock wakeLock;
         public override void OnCreate()
         {
+            WebServer.Start();
             base.OnCreate();
-
-            //var pm = (PowerManager)GetSystemService(PowerService);
-            //wakeLock = pm.NewWakeLock(
-            //    WakeLockFlags.Partial,
-            //    "BNetSMS::HttpServerWakeLock"
-            //);
-            //wakeLock.Acquire();
-
-
-            //RUN AGAIN THE MAIN PAGE
-            var mainActivity = new Android.Content.Intent(Android.App.Application.Context, typeof(MainActivity));
-            Android.App.Application.Context.StartService(mainActivity);
         }
-
         public override void OnDestroy()
         {
-            if (wakeLock?.IsHeld == true)
-                wakeLock.Release();
-
+            var notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            notificationManager.Cancel(1002); // SAME ID as StartForeground
+            StopForeground(true);
             base.OnDestroy();
-        }
-        public override void OnTaskRemoved(Intent rootIntent)
-        {
-            base.OnTaskRemoved(rootIntent);
         }
     }
 }

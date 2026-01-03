@@ -80,8 +80,8 @@
     <Compile Include="Services\BatteryOptimizationServices\OptimizeBattery.cs" />
     <Compile Include="Services\BroadCastReceiverServices\RebootReceiver.cs" />
     <Compile Include="Services\FloatingServices\FloatingIcon.cs" />
-    <Compile Include="Services\HttpListenerServices\WebServer.cs" />
-    <Compile Include="Services\HttpListenerServices\Models\SendPayload.cs" />
+    <Compile Include="Services\HttpServices\WebServer.cs" />
+    <Compile Include="Services\HttpServices\Models\SendPayload.cs" />
     <Compile Include="Services\BroadCastReceiverServices\SmsDeliveryReceiver.cs" />
     <Compile Include="Services\BroadCastReceiverServices\SmsReceiver.cs" />
     <Compile Include="Services\ExitAppServices\RecentTasks.cs" />

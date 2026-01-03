@@ -14,7 +14,7 @@ using AndroidX.Core.View;
 using AndroidX.DrawerLayout.Widget;
 using BNet.Mobile.SMS.Services.BroadCastReceiverServices;
 using BNet.Mobile.SMS.Services.FloatingServices;
-using BNet.Mobile.SMS.Services.HttpListenerServices;
+using BNet.Mobile.SMS.Services.HttpServices;
 using BNet.Mobile.SMS.Services.PermissionServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
 using System.IO;
@@ -34,19 +34,17 @@ namespace BNet.Mobile.SMS
         // AD HOC PASSWORD : 123456
         protected override void OnRestart()
         {
-            base.OnRestart();
             HtmlElement.Refresh();
+            base.OnRestart();
         }
         protected override void OnResume()
         {
-            base.OnResume();
             HtmlElement.Refresh();
+            base.OnResume();
         }
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            SetContentView(Resource.Layout.activity_main);
 
             //REGISTER CUSTOM BROADCAST RECEIVER
             SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
@@ -76,33 +74,7 @@ namespace BNet.Mobile.SMS
             WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
             StartTimer(scriptContext);
-
-
-
-            //try
-            //{
-            //    var intent = new Android.Content.Intent(Android.Provider.Settings.ActionManageOverlayPermission);
-            //    intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
-            //    intent.AddFlags(ActivityFlags.NewTask);
-            //    Application.Context.StartActivity(intent);
-            //}
-            //catch
-            //{
-
-            //}
-
-            //try
-            //{
-            //    var intent = new Android.Content.Intent(Android.Provider.Settings.ActionAppNotificationSettings);
-            //    intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
-            //    intent.AddFlags(ActivityFlags.NewTask);
-            //    Application.Context.StartActivity(intent);
-            //}
-            //catch
-            //{
-
-            //}
-
+            base.OnCreate(savedInstanceState);
         }
 
 
@@ -205,6 +177,7 @@ namespace BNet.Mobile.SMS
             int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
             decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
             SupportActionBar?.Hide();
+            SetContentView(Resource.Layout.activity_main);
         }
 
     }

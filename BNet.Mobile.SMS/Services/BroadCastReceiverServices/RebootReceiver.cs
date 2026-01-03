@@ -27,9 +27,9 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiverServices
                     if (Properties.IsBackgroundService())
                     {
                         // Toast to indicate boot completed (optional)
-                        Toast.MakeText(context, "Device Rebooted - Starting Service", ToastLength.Short).Show();
-                        var serviceIntent = new Intent(context, typeof(FloatingIcon));
-                        context.StartService(serviceIntent);
+                        //Toast.MakeText(context, "Device Rebooted - Starting Service", ToastLength.Short).Show();
+                        //ForegroundTasks.StartService();
+                        //FloatingIcon.StartService();
                     }
                 }
                 catch (Exception ex)

@@ -54,8 +54,6 @@ namespace BNet.Mobile.SMS
                     //ForegroundTasks.StartService();
                     FloatingIcon.StartService();
 
-
-
                     AlertDialog.Builder alert = new AlertDialog.Builder(context);
                     alert.SetCancelable(false);
                     alert.SetTitle("Message");
@@ -69,10 +67,19 @@ namespace BNet.Mobile.SMS
             }
             else
             {
-                var intent = new Android.Content.Intent(Android.Provider.Settings.ActionManageOverlayPermission);
-                intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
-                intent.AddFlags(ActivityFlags.NewTask);
-                Application.Context.StartActivity(intent);
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.SetTitle("Permission Required");
+                alert.SetMessage("Go to Advanced\n\nAllowed Display over Other Apps");
+                alert.SetPositiveButton("Ok", (senderAlert, args) =>
+                {
+                    var intent = new Android.Content.Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
+                    intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
+                    intent.AddFlags(ActivityFlags.NewTask);
+                    Application.Context.StartActivity(intent);
+                });
+                alert.Show();
+
+
             }
         }
 

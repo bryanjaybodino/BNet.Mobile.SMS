@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.HttpListenerServices.Models
+namespace BNet.Mobile.SMS.Services.HttpServices.Models
 {
     internal class SendPayload
     {
