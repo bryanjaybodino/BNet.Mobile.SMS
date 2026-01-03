@@ -75,7 +75,6 @@ namespace BNet.Mobile.SMS.Services.HttpListenerServices
                         }
 
                         response.Close();
-                        await Task.Delay(100); // yield to OS
                     }
                 }
                 catch (Exception ex)

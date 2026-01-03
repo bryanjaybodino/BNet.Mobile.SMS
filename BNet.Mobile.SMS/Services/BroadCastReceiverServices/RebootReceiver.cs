@@ -4,7 +4,9 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using BNet.Mobile.SMS.Services.FloatingServices;
 using BNet.Mobile.SMS.Services.ForegroundServices;
+using BNet.Mobile.SMS.Services.TempDataServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,17 +24,11 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiverServices
             {
                 try
                 {
-                    // Toast to indicate boot completed (optional)
-                    Toast.MakeText(context, "Device Rebooted - Starting Service", ToastLength.Short).Show();
-
-                    var serviceIntent = new Intent(context, typeof(ForegroundTasks));
-
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.O) // Android 8.0+
+                    if (Properties.IsBackgroundService())
                     {
-                        context.StartForegroundService(serviceIntent);
-                    }
-                    else
-                    {
+                        // Toast to indicate boot completed (optional)
+                        Toast.MakeText(context, "Device Rebooted - Starting Service", ToastLength.Short).Show();
+                        var serviceIntent = new Intent(context, typeof(FloatingIcon));
                         context.StartService(serviceIntent);
                     }
                 }

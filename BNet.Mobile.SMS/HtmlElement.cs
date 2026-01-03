@@ -45,6 +45,18 @@ namespace BNet.Mobile.SMS
                 scriptContext.UpdateInnerText(Label_ReceivedQueue, (await SaveQueue.CountAsync()).ToString());
                 scriptContext.UpdateInnerText(Label_ReceivedSuccess, (SaveMessage.CountSave()).ToString());
                 scriptContext.UpdateValue(Textbox_Connection, Properties.DatabaseConnection());
+
+
+                if (Properties.IsBackgroundService())
+                {
+                    scriptContext.UpdateElementAttribute(Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
+                    scriptContext.UpdateInnerText(Label_RunService, "Service is running");
+                }
+                else
+                {
+                    scriptContext.UpdateElementAttribute(Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
+                    scriptContext.UpdateInnerText(Label_RunService, "Start Service");
+                }
                 isRefresh = true;
             }
         }

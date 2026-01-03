@@ -62,6 +62,34 @@ namespace BNet.Mobile.SMS.Services.TempDataServices
             }
             catch { return false; }
         }
+
+        public static bool IsBackgroundService()
+        {
+            try
+            {
+                if (SecureStorage.GetAsync("IsBackgroundService") != null)
+                {
+                    using (var data = SecureStorage.GetAsync("IsBackgroundService"))
+                    {
+                        data.Wait();
+                        if (data.Result.ToUpper() == "TRUE")
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch { return false; }
+        }
+
         public static void SetDatabaseConnection(string data)
         {
             try
@@ -78,5 +106,18 @@ namespace BNet.Mobile.SMS.Services.TempDataServices
             }
             catch { }
         }
+
+        public static void SetIsBackgroundService(bool data)
+        {
+            try
+            {
+                SecureStorage.SetAsync("IsBackgroundService", data.ToString());
+            }
+            catch { }
+        }
+
+
+
+
     }
 }

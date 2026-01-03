@@ -77,12 +77,14 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptContext.cs" />
+    <Compile Include="Services\BatteryOptimizationServices\OptimizeBattery.cs" />
     <Compile Include="Services\BroadCastReceiverServices\RebootReceiver.cs" />
+    <Compile Include="Services\FloatingServices\FloatingIcon.cs" />
     <Compile Include="Services\HttpListenerServices\WebServer.cs" />
     <Compile Include="Services\HttpListenerServices\Models\SendPayload.cs" />
     <Compile Include="Services\BroadCastReceiverServices\SmsDeliveryReceiver.cs" />
     <Compile Include="Services\BroadCastReceiverServices\SmsReceiver.cs" />
-    <Compile Include="Services\ExitAppServiceServices\RecentTasks.cs" />
+    <Compile Include="Services\ExitAppServices\RecentTasks.cs" />
     <Compile Include="Services\DatabaseServices\CreateDatabase.cs" />
     <Compile Include="Services\DatabaseServices\DBQuery_IDU.cs" />
     <Compile Include="Services\DatabaseServices\DBSelectValue.cs" />

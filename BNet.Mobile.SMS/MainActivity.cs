@@ -10,7 +10,10 @@ using Android.Views;
 using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
+using AndroidX.Core.View;
+using AndroidX.DrawerLayout.Widget;
 using BNet.Mobile.SMS.Services.BroadCastReceiverServices;
+using BNet.Mobile.SMS.Services.FloatingServices;
 using BNet.Mobile.SMS.Services.HttpListenerServices;
 using BNet.Mobile.SMS.Services.PermissionServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
@@ -20,6 +23,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using static Android.Bluetooth.BluetoothClass;
 using static Google.Android.Material.Tabs.TabLayout;
+using static Xamarin.Essentials.Platform;
 
 namespace BNet.Mobile.SMS
 {
@@ -28,7 +32,6 @@ namespace BNet.Mobile.SMS
     {
 
         // AD HOC PASSWORD : 123456
-
         protected override void OnRestart()
         {
             base.OnRestart();
@@ -73,6 +76,33 @@ namespace BNet.Mobile.SMS
             WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
             StartTimer(scriptContext);
+
+
+
+            //try
+            //{
+            //    var intent = new Android.Content.Intent(Android.Provider.Settings.ActionManageOverlayPermission);
+            //    intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
+            //    intent.AddFlags(ActivityFlags.NewTask);
+            //    Application.Context.StartActivity(intent);
+            //}
+            //catch
+            //{
+
+            //}
+
+            //try
+            //{
+            //    var intent = new Android.Content.Intent(Android.Provider.Settings.ActionAppNotificationSettings);
+            //    intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
+            //    intent.AddFlags(ActivityFlags.NewTask);
+            //    Application.Context.StartActivity(intent);
+            //}
+            //catch
+            //{
+
+            //}
+
         }
 
 

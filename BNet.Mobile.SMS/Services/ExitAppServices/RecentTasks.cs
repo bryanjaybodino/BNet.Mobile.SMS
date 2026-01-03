@@ -4,12 +4,13 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using BNet.Mobile.SMS.Services.FloatingServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BNet.Mobile.SMS.Services.ExitAppServiceServices
+namespace BNet.Mobile.SMS.Services.ExitAppServices
 {
     public class RecentTasks
     {
@@ -17,7 +18,6 @@ namespace BNet.Mobile.SMS.Services.ExitAppServiceServices
         {
             // Get current activity safely
             var activity = Xamarin.Essentials.Platform.CurrentActivity;
-
             if (activity == null)
             {
                 // Could not get current activity, maybe log or silently return
@@ -34,6 +34,11 @@ namespace BNet.Mobile.SMS.Services.ExitAppServiceServices
                 // For older Android versions, just finish affinity
                 activity.FinishAffinity();
             }
+        }
+        public static void MoveTaskToBack()
+        {
+            var activity = Xamarin.Essentials.Platform.CurrentActivity;
+            activity?.MoveTaskToBack(true); // Sends app to background without killing service
         }
     }
 }

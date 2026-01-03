@@ -5,8 +5,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
-using BNet.Mobile.SMS.Services.ExitAppServiceServices;
 using BNet.Mobile.SMS.Services.DatabaseServices;
+using BNet.Mobile.SMS.Services.ExitAppServices;
+using BNet.Mobile.SMS.Services.FloatingServices;
 using BNet.Mobile.SMS.Services.ForegroundServices;
 using BNet.Mobile.SMS.Services.TempDataServices;
 using Java.Interop;
@@ -35,31 +36,49 @@ namespace BNet.Mobile.SMS
         [Export("Service")]
         public void Service(string IconClass)
         {
-            if (IconClass == "bi bi-stop-circle fs-3 text-danger")
+
+            bool canOverlay = Android.Provider.Settings.CanDrawOverlays(Application.Context);
+            if (canOverlay)
             {
-                UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
-                UpdateInnerText(HtmlElement.Label_RunService, "Start Service");
-                ForegroundTasks.StopMyForeGroundService();
+                if (IconClass == "bi bi-stop-circle fs-3 text-danger")
+                {
+                    UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
+                    UpdateInnerText(HtmlElement.Label_RunService, "Start Service");
+                    //ForegroundTasks.StopService();
+                    FloatingIcon.StopService();
+                }
+                else
+                {
+                    UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
+                    UpdateInnerText(HtmlElement.Label_RunService, "Service is running");
+                    //ForegroundTasks.StartService();
+                    FloatingIcon.StartService();
+
+
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                    alert.SetCancelable(false);
+                    alert.SetTitle("Message");
+                    alert.SetMessage("The app is closing in order to run in the background.");
+                    alert.SetPositiveButton("Ok", (senderAlert, args) =>
+                    {
+                        RecentTasks.RemoveAppFromRecentTasks();
+                    });
+                    alert.Show();
+                }
             }
             else
             {
-                UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
-                UpdateInnerText(HtmlElement.Label_RunService, "Service is running");
-                ForegroundTasks.StartMyForeGroundService();
-
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.SetCancelable(false);
-                alert.SetTitle("Message");
-                alert.SetMessage("The app is closing in order to run in the background.");
-                alert.SetPositiveButton("Ok", (senderAlert, args) => {
-                    RecentTasks.RemoveAppFromRecentTasks();
-                });
-                alert.Show();
-
-
+                var intent = new Android.Content.Intent(Android.Provider.Settings.ActionManageOverlayPermission);
+                intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));
+                intent.AddFlags(ActivityFlags.NewTask);
+                Application.Context.StartActivity(intent);
             }
         }
+
+
+
+
 
 
 

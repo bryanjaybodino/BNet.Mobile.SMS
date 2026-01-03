@@ -6,8 +6,10 @@ using Android.Service.QuickSettings;
 using Android.Views;
 using Android.Widget;
 using AndroidX.Core.App;
+using BNet.Mobile.SMS.Services.FloatingServices;
 using BNet.Mobile.SMS.Services.HttpListenerServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
+using BNet.Mobile.SMS.Services.TempDataServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using static Android.OS.PowerManager;
+
 
 namespace BNet.Mobile.SMS.Services.ForegroundServices
 {
@@ -30,13 +32,15 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
 
         public override StartCommandResult OnStartCommand(Intent intent, [GeneratedEnum] StartCommandFlags flags, int startId)
         {
+
+
             string channelId = "ForeGroundServiceChannel";
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
 
             // ✅ Create notification channel only on Android 8.0+
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(channelId, "Foreground Service Channel", NotificationImportance.Low)
+                var channel = new NotificationChannel(channelId, "Foreground Service Channel", NotificationImportance.Min)
                 {
                     LockscreenVisibility = NotificationVisibility.Private
                 };
@@ -63,79 +67,47 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
                 .SetPriority((int)NotificationPriority.Max)
                 .SetOngoing(true)
                 .SetAutoCancel(false)
-                .SetSmallIcon(Resource.Mipmap.ic_launcher_foreground)
+                .SetSmallIcon(Resource.Drawable.icon)
                 .SetContentIntent(pendingIntent);
 
             var notification = notificationBuilder.Build();
             StartForeground(1002, notification);
 
-
-            StartWorker();
+            //();
             return StartCommandResult.Sticky;
         }
 
-        public static void StartMyForeGroundService()
+        public static void StartService()
         {
             var intent = new Intent(Android.App.Application.Context, typeof(ForegroundTasks));
-
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                // ✅ Android 8.0+ requires StartForegroundService
-                Android.App.Application.Context.StartForegroundService(intent);
-            }
-            else
-            {
-                // ✅ Older Android uses StartService
-                Android.App.Application.Context.StartService(intent);
-            }
+            Android.App.Application.Context.StartService(intent);
+            Properties.SetIsBackgroundService(true);
         }
 
-        public static void StopMyForeGroundService()
+        public static void StopService()
         {
             var intent = new Intent(Android.App.Application.Context, typeof(ForegroundTasks));
             Android.App.Application.Context.StopService(intent);
+            Properties.SetIsBackgroundService(false);
+
         }
-
-        CancellationTokenSource cts;
-        void StartWorker()
-        {
-            //API Server For Client Connection
-            WebServer.Start();
-            cts = new CancellationTokenSource();
-
-            Task.Run(async () =>
-            {
-                while (!cts.Token.IsCancellationRequested)
-                {
-                    TimeTrigger.ProcessSendingMessages();
-                    TimeTrigger.ProcessSavingMessages();
-                    await Task.Delay(500);
-                }
-            });
-        }
-
-
-        static bool ServiceRunning = false;
-
-        public bool IsRunning()
-        {
-            return ServiceRunning;
-        }
-
 
         PowerManager.WakeLock wakeLock;
         public override void OnCreate()
         {
             base.OnCreate();
-            ServiceRunning = true;
 
-            var pm = (PowerManager)GetSystemService(PowerService);
-            wakeLock = pm.NewWakeLock(
-                WakeLockFlags.Partial,
-                "BNetSMS::HttpServerWakeLock"
-            );
+            //var pm = (PowerManager)GetSystemService(PowerService);
+            //wakeLock = pm.NewWakeLock(
+            //    WakeLockFlags.Partial,
+            //    "BNetSMS::HttpServerWakeLock"
+            //);
+            //wakeLock.Acquire();
 
-            wakeLock.Acquire();
+
+            //RUN AGAIN THE MAIN PAGE
+            var mainActivity = new Android.Content.Intent(Android.App.Application.Context, typeof(MainActivity));
+            Android.App.Application.Context.StartService(mainActivity);
         }
 
         public override void OnDestroy()
@@ -144,6 +116,10 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
                 wakeLock.Release();
 
             base.OnDestroy();
+        }
+        public override void OnTaskRemoved(Intent rootIntent)
+        {
+            base.OnTaskRemoved(rootIntent);
         }
     }
 }
