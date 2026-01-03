@@ -37,7 +37,7 @@
         <!-- Sent Messages -->
         <div class="card shadow-sm mb-2">
             <div class="card-body bg-success text-white">
-                <h6 class="fw-bold mb-2">Sent Messages</h6>
+                <h6 class="fw-bold mb-2"><i class="bi-chat-fill"></i> Sent Messages</h6>
                 <div class="d-flex justify-content-between">
                     <span>Queue</span><span id="Label_SentQueue">0</span>
                 </div>
@@ -53,7 +53,7 @@
         <!-- No Database -->
         <div class="card shadow-sm mb-2">
             <div class="card-body bg-secondary text-white">
-                <h6 class="fw-bold mb-2">No Database Found</h6>
+                <h6 class="fw-bold mb-2" id="Label_DatabaseStatus"><i class='bi-x-lg'></i> No Database Found</h6>
                 <div class="d-flex justify-content-between">
                     <span>Queue</span><span id="Label_ReceivedQueue">0</span>
                 </div>
@@ -132,7 +132,7 @@
                     <!-- Settings Buttons -->
                     <ul class="nav nav-tabs" id="settingsTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="database-tab" data-bs-toggle="tab" href="#database">Database Connection</a>
+                            <a class="nav-link active" id="database-tab" data-bs-toggle="tab" href="#database">Mysql Connection</a>
                         </li>
                     </ul>
                     <div class="tab-content mt-1" id="settingsTabContent">

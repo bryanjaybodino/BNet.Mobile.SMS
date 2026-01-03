@@ -43,14 +43,14 @@ namespace BNet.Mobile.SMS
                 if (IconClass == "bi bi-stop-circle fs-3 text-danger")
                 {
                     UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
-                    UpdateInnerText(HtmlElement.Label_RunService, "Start Service");
+                    UpdateInnerHtml(HtmlElement.Label_RunService, "Start Service");
                     //ForegroundTasks.StopService();
                     FloatingIcon.StopService();
                 }
                 else
                 {
                     UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
-                    UpdateInnerText(HtmlElement.Label_RunService, "Service is running");
+                    UpdateInnerHtml(HtmlElement.Label_RunService, "Service is running");
                     //ForegroundTasks.StartService();
                     FloatingIcon.StartService();
 
@@ -115,7 +115,7 @@ namespace BNet.Mobile.SMS
 
 
                 RemoveAttribute(HtmlElement.Button_SaveSettings, "disabled");
-                UpdateInnerText(HtmlElement.Button_SaveSettings, "Save changes");
+                UpdateInnerHtml(HtmlElement.Button_SaveSettings, "Save changes");
             });
         }
 
@@ -187,19 +187,6 @@ namespace BNet.Mobile.SMS
 
             });
         }
-        public void UpdateInnerText(string id, string value)
-        {
-            // Ensure we're on UI thread
-            webView.Post(() =>
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    value = value.Replace("'", "\\'");
-                    string js = $"document.getElementById('{id}').innerText = '{value}';";
-                    webView.EvaluateJavascript(js, null);
-                }
-            });
-        }
         public void UpdateInnerHtml(string id, string value)
         {
             // Ensure we're on UI thread
@@ -208,7 +195,7 @@ namespace BNet.Mobile.SMS
                 if (!string.IsNullOrEmpty(value))
                 {
                     value = value.Replace("'", "\\'");
-                    string js = $"document.getElementById('{id}').innerHtml = '{value}';";
+                    string js = $"document.getElementById('{id}').innerHTML = '{value}';";
                     webView.EvaluateJavascript(js, null);
                 }
             });

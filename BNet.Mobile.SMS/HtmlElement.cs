@@ -21,6 +21,7 @@ namespace BNet.Mobile.SMS
         public static string Label_SentQueue = "Label_SentQueue";
         public static string Label_SentSuccess = "Label_SentSuccess";
         public static string Label_SentFailed = "Label_SentFailed";
+        public static string Label_DatabaseStatus = "Label_DatabaseStatus";
         public static string Label_ReceivedQueue = "Label_ReceivedQueue";
         public static string Label_ReceivedSuccess = "Label_ReceivedSuccess";
         public static string Icon_RunService = "Icon_RunService";
@@ -38,26 +39,34 @@ namespace BNet.Mobile.SMS
         {
             if (isRefresh)
             {
-                scriptContext.UpdateInnerText(Label_Connection, NetworkChecker.LocalConnection());
-                scriptContext.UpdateInnerText(Label_SentQueue, (await SendQueue.CountAsync()).ToString());
-                scriptContext.UpdateInnerText(Label_SentSuccess, (SendMessage.CountSent()).ToString());
-                scriptContext.UpdateInnerText(Label_SentFailed, (SendMessage.CountFailed()).ToString());
-                scriptContext.UpdateInnerText(Label_ReceivedQueue, (await SaveQueue.CountAsync()).ToString());
-                scriptContext.UpdateInnerText(Label_ReceivedSuccess, (SaveMessage.CountSave()).ToString());
-                scriptContext.UpdateValue(Textbox_Connection, Properties.DatabaseConnection());
+                scriptContext.UpdateInnerHtml(Label_Connection, NetworkChecker.LocalConnection());
+                scriptContext.UpdateInnerHtml(Label_SentQueue, (await SendQueue.CountAsync()).ToString());
+                scriptContext.UpdateInnerHtml(Label_SentSuccess, (SendMessage.CountSent()).ToString());
+                scriptContext.UpdateInnerHtml(Label_SentFailed, (SendMessage.CountFailed()).ToString());
+                scriptContext.UpdateInnerHtml(Label_ReceivedQueue, (await SaveQueue.CountAsync()).ToString());
+                scriptContext.UpdateInnerHtml(Label_ReceivedSuccess, (SaveMessage.CountSave()).ToString());
 
+                scriptContext.UpdateValue(Textbox_Connection, Properties.DatabaseConnection());
+                if (Properties.IsMySQLEnabled())
+                {
+                    scriptContext.UpdateInnerHtml(Label_DatabaseStatus, "<i class='bi-check-lg'></i> Database is connected</span>");
+                }
+                else
+                {
+                    scriptContext.UpdateInnerHtml(Label_DatabaseStatus, "<i class='bi-x-lg'></i> No Database Found");
+                }
 
                 if (Properties.IsBackgroundService())
                 {
                     scriptContext.UpdateElementAttribute(Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
-                    scriptContext.UpdateInnerText(Label_RunService, "Service is running");
+                    scriptContext.UpdateInnerHtml(Label_RunService, "Service is running");
                 }
                 else
                 {
                     scriptContext.UpdateElementAttribute(Icon_RunService, "class", "bi bi-play-circle fs-3 text-success");
-                    scriptContext.UpdateInnerText(Label_RunService, "Start Service");
+                    scriptContext.UpdateInnerHtml(Label_RunService, "Start Service");
                 }
-                isRefresh = true;
+                isRefresh = false;
             }
         }
 
