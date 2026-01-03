@@ -44,9 +44,17 @@ namespace BNet.Mobile.SMS
             HtmlElement.Refresh();
             base.OnResume();
         }
+        protected override void OnNewIntent(Intent intent)
+        {
+            HtmlElement.Refresh();
+            base.OnNewIntent(intent);
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+            HtmlElement.Refresh();
 
             //REGISTER CUSTOM BROADCAST RECEIVER
             SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
@@ -76,7 +84,6 @@ namespace BNet.Mobile.SMS
             WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
             StartTimer(scriptContext);
-            base.OnCreate(savedInstanceState);
         }
 
 
