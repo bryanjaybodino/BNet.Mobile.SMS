@@ -11,6 +11,8 @@ using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using BNet.Mobile.SMS.Services.BroadCastReceiverServices;
+using BNet.Mobile.SMS.Services.FloatingServices;
+using BNet.Mobile.SMS.Services.ForegroundServices;
 using BNet.Mobile.SMS.Services.HttpServices;
 using BNet.Mobile.SMS.Services.PermissionServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
@@ -32,7 +34,6 @@ namespace BNet.Mobile.SMS
     [MetaData("android:largeHeap", Value = "true")]
     public class MainActivity : AppCompatActivity
     {
-
         // AD HOC PASSWORD : 123456
         protected override void OnRestart()
         {
@@ -41,20 +42,22 @@ namespace BNet.Mobile.SMS
         }
         protected override void OnResume()
         {
-            HtmlElement.Refresh();
             base.OnResume();
         }
         protected override void OnNewIntent(Intent intent)
         {
-            HtmlElement.Refresh();
+            Intent = intent;
             base.OnNewIntent(intent);
         }
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            ForegroundTasks.StopService();
+            FloatingIcon.StopService();
+
+            SetContentView(Resource.Layout.activity_main);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            HtmlElement.Refresh();
 
             //REGISTER CUSTOM BROADCAST RECEIVER
             SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
@@ -83,7 +86,13 @@ namespace BNet.Mobile.SMS
             webView.AddJavascriptInterface(scriptContext, "ScriptContext");
             WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
             webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
+
+
+            HtmlElement.Refresh();
+            await HtmlElement.Update(scriptContext);
+
             StartTimer(scriptContext);
+
         }
 
 
@@ -186,7 +195,7 @@ namespace BNet.Mobile.SMS
             int uiOptions = (int)SystemUiFlags.Fullscreen | (int)SystemUiFlags.HideNavigation | (int)SystemUiFlags.ImmersiveSticky;
             decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
             SupportActionBar?.Hide();
-            SetContentView(Resource.Layout.activity_main);
+
         }
 
     }

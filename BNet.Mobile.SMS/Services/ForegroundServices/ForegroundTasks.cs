@@ -70,8 +70,8 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
                 .SetAutoCancel(false)
                 .SetOnlyAlertOnce(true)
                 .SetSmallIcon(Resource.Drawable.icon)
-                .SetCategory(Notification.CategoryService);
-                //.SetContentIntent(pendingIntent); // Not Clickable to avoid opening the app
+                .SetCategory(Notification.CategoryService)
+                .SetContentIntent(pendingIntent); //To make it clickable to open the app
 
             var notification = notificationBuilder.Build();
             StartForeground(1002, notification);

@@ -183,6 +183,7 @@ namespace BNet.Mobile.SMS
                     value = value.Replace("'", "\\'");
                     string js = $"document.getElementById('{id}').value = '{value}';";
                     webView.EvaluateJavascript(js, null);
+                    HtmlElement.Refresh();
                 }
 
             });
@@ -197,6 +198,7 @@ namespace BNet.Mobile.SMS
                     value = value.Replace("'", "\\'");
                     string js = $"document.getElementById('{id}').innerHTML = '{value}';";
                     webView.EvaluateJavascript(js, null);
+                    HtmlElement.Refresh();
                 }
             });
         }
@@ -211,6 +213,7 @@ namespace BNet.Mobile.SMS
                     value = value.Replace("'", "\\'"); // Escape single quotes in the value
                     string js = $"document.getElementById('{id}').setAttribute('{attribute}', '{value}');";
                     webView.EvaluateJavascript(js, null);
+                    HtmlElement.Refresh();
                 }
             });
         }
@@ -225,6 +228,7 @@ namespace BNet.Mobile.SMS
                 {
                     string js = $"document.getElementById('{id}').removeAttribute('{attribute}');";
                     webView.EvaluateJavascript(js, null);
+                    HtmlElement.Refresh();
                 }
             });
         }
