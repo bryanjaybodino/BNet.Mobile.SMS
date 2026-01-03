@@ -10,10 +10,7 @@ using Android.Views;
 using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
-using AndroidX.Core.View;
-using AndroidX.DrawerLayout.Widget;
 using BNet.Mobile.SMS.Services.BroadCastReceiverServices;
-using BNet.Mobile.SMS.Services.FloatingServices;
 using BNet.Mobile.SMS.Services.HttpServices;
 using BNet.Mobile.SMS.Services.PermissionServices;
 using BNet.Mobile.SMS.Services.ServiceBus;
@@ -21,13 +18,18 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using static Android.Bluetooth.BluetoothClass;
-using static Google.Android.Material.Tabs.TabLayout;
-using static Xamarin.Essentials.Platform;
 
 namespace BNet.Mobile.SMS
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+
+
+    [Activity(Label = "SMS Integration",
+              Icon = "@drawable/icon",
+              Theme = "@style/AppTheme",
+              MainLauncher = true,
+              HardwareAccelerated = true,
+              ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
+    [MetaData("android:largeHeap", Value = "true")]
     public class MainActivity : AppCompatActivity
     {
 

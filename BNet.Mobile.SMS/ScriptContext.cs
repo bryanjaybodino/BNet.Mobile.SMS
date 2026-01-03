@@ -69,8 +69,11 @@ namespace BNet.Mobile.SMS
             {
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 alert.SetTitle("Permission Required");
-                alert.SetMessage("Go to Advanced\n\nAllowed Display over Other Apps");
-                alert.SetPositiveButton("Ok", (senderAlert, args) =>
+                alert.SetMessage(
+                     "This app needs permission to display over other apps.\n\n" +
+                     "Please go to Advanced settings and enable \"Display over other apps\"."
+                    );
+                alert.SetPositiveButton("Open Settings", (senderAlert, args) =>
                 {
                     var intent = new Android.Content.Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
                     intent.SetData(Android.Net.Uri.Parse("package:" + Application.Context.PackageName));

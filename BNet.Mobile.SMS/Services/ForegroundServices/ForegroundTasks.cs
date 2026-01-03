@@ -39,7 +39,7 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
             // ✅ Create notification channel only on Android 8.0+
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(channelId, "Foreground Service Channel", NotificationImportance.Max)
+                var channel = new NotificationChannel(channelId, "Foreground Service Channel", NotificationImportance.Min)
                 {
                     LockscreenVisibility = NotificationVisibility.Private,
                 };
@@ -65,10 +65,12 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
             var notificationBuilder = new NotificationCompat.Builder(this, channelId)
                 .SetContentTitle("Background Service")
                 .SetContentText("SMS Integration is running")
-                .SetPriority((int)NotificationPriority.Max)
+                .SetPriority((int)NotificationPriority.Min)
                 .SetOngoing(true)
                 .SetAutoCancel(false)
+                .SetOnlyAlertOnce(true)
                 .SetSmallIcon(Resource.Drawable.icon)
+                .SetCategory(Notification.CategoryService)
                 .SetContentIntent(pendingIntent);
 
             var notification = notificationBuilder.Build();
@@ -100,6 +102,7 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
             notificationManager.Cancel(1002); // SAME ID as StartForeground
             StopForeground(true);
+            Properties.SetIsBackgroundService(false);
             base.OnDestroy();
         }
     }
