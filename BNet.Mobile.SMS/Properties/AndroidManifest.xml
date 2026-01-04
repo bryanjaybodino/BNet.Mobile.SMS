@@ -3,13 +3,13 @@
           android:installLocation="internalOnly"
 		  android:versionCode="1"
           android:versionName="1.0"
-          package="com.companyname.bnet.mobile.sms">
+          package="bnet.sms.integration">
 	<uses-sdk android:minSdkVersion="28" android:targetSdkVersion="33"  />
 	<application android:theme="@style/AppTheme" android:label="SMS Integration" android:largeHeap="true" android:hardwareAccelerated="true" android:icon="@drawable/icon">
-		<service
+	<!--	<service
 			android:name="BNet.Mobile.SMS.Services.ForegroundServices.ForegroundTasks"
 			android:exported="false"
-			android:foregroundServiceType="dataSync" />
+			android:foregroundServiceType="dataSync" /> -->
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.READ_SMS" />
@@ -24,4 +24,5 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 	<uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 </manifest>

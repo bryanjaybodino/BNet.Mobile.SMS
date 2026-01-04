@@ -20,17 +20,19 @@
     <title>BNET SMS</title>
 </head>
 
-<body>
+<body class="bg-body">
     <div class="container">
         <!-- Header -->
         <div class="d-flex justify-content-between mb-3">
             <div>
-                <h2 class="fw-bold text-primary mb-1">SMS Integration</h2>
+                <h2 class="fw-bold mb-1">SMS Integration</h2>
                 <span class="fw-bold text-muted">API Connection : </span>
                 <small id="Label_Connection" class="text-muted">http://0.0.0.0:8030</small>
             </div>
-            <div class="text-end px-2">
-                <i class="fs-3" id="themeToggle" style="cursor:pointer;"></i>
+            <div class="text-end">
+                <button id="themeToggle" class="btn btn-sm btn-dark">
+                    <i class="bi bi-sun-fill" style="font-size:15px!important"></i>
+                </button>
             </div>
         </div>
 
@@ -96,7 +98,7 @@
         </div>
 
         <!-- Developer -->
-        <div class="card shadow-sm mb-2">
+        <div class="card shadow-sm mb-2" data-bs-toggle="modal" data-bs-target="#DeveloperModal">
             <div class="card-body d-flex gap-2">
                 <i class="bi bi-person-circle fs-3 text-success"></i>
                 <div class="flex-grow-1">
@@ -107,7 +109,7 @@
         </div>
 
         <!-- Service Status -->
-        <div class="card shadow-sm">
+        <!--<div class="card shadow-sm">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <div class="fw-semibold">Service Status</div>
@@ -117,39 +119,129 @@
                     <input class="form-check-input" type="checkbox" checked>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 
     <!-- Settings Modal -->
-    <div class="modal fade" id="SettingsModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="SettingsModal" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Settings</h5>
+
+                <!-- Header -->
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <!-- Settings Buttons -->
+
+                <!-- Body -->
+                <div class="modal-body pt-3">
+
+                    <!-- Tabs -->
                     <ul class="nav nav-tabs" id="settingsTab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <a class="nav-link active" id="database-tab" data-bs-toggle="tab" href="#database">Mysql Connection</a>
                         </li>
                     </ul>
-                    <div class="tab-content mt-1" id="settingsTabContent">
+
+                    <!-- Tab Content -->
+                    <div class="tab-content pt-1" id="settingsTabContent">
                         <!-- Database Tab -->
-                        <div class="tab-pane fade show active" id="database">
-                            <div class="mb-3">
-                                <textarea class="form-control" id="Textbox_Connection" rows="10">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</textarea>
+                        <div class="tab-pane fade show active" id="database" role="tabpanel">
+                            <div class="mb-2">
+                                <textarea class="form-control" id="Textbox_Connection" rows="8">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</textarea>
+                                <div class="form-text">
+                                    Enter your MySQL connection string.
+                                </div>
                             </div>
+
                         </div>
                     </div>
+
                 </div>
+
+                <!-- Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" id="Button_SaveSettings" class="btn btn-primary" onclick="SaveSettings()">
-                        Save changes
+                    <button type="button" id="Button_SaveSettings" class="btn btn-primary btn-sm w-100" onclick="SaveSettings()">
+                        <i class="bi bi-save me-1"></i> Save changes
                     </button>
                 </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Developer Profile Modal -->
+    <div class="modal fade" id="DeveloperModal" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-person-circle me-2"></i>Developer
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body d-flex justify-content-center">
+                    <div class="text-center">
+                        <div class="py-4"></div>
+
+                        <!-- Profile Icon -->
+                        <div class="mb-3 d-flex justify-content-center">
+                            <span class="d-inline-flex align-items-center justify-content-center bg-secondary text-white rounded-circle shadow-sm"
+                                  style="width: 80px; height: 80px;">
+                                <i class="bi bi-code-slash fs-2"></i>
+                            </span>
+                        </div>
+
+                        <!-- Name & Role -->
+                        <h4 class="fw-bold mb-1">Bryan Jay Bodino</h4>
+                        <p class="text-body-secondary mb-3">
+                            Full Stack Web Developer
+                        </p>
+
+                        <!-- Bio (left-aligned now) -->
+                        <p class="text-body-secondary small text-start mx-auto mb-4" style="max-width: 360px;">
+                            Building fast, secure, and user-friendly applications
+                            with modern web technologies. <br>
+                            For more inquiries or concerns, feel free to contact me using the buttons below.
+                        </p>
+
+                        <!-- Actions -->
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center flex-wrap">
+                            <a href="mailto:bryanjaybodino@gmail.com"
+                               class="btn btn-outline-secondary btn-sm px-3 w-100 w-sm-auto">
+                                <i class="bi bi-envelope me-1"></i>Email
+                            </a>
+
+                            <a href="tel:+639614348390"
+                               class="btn btn-outline-secondary btn-sm px-3 w-100 w-sm-auto">
+                                <i class="bi bi-telephone me-1"></i>Phone
+                            </a>
+
+                            <a href="https://github.com/bryanjaybodino"
+                               class="btn btn-outline-secondary btn-sm px-3 w-100 w-sm-auto">
+                                <i class="bi bi-github me-1"></i>GitHub
+                            </a>
+
+                            <a href="https://bryanjaybodino.com"
+                               class="btn btn-outline-secondary btn-sm px-3 w-100 w-sm-auto">
+                                <i class="bi bi-globe me-1"></i>Website
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Footer (optional) -->
+                <div class="modal-footer border-0"></div>
             </div>
         </div>
     </div>
@@ -157,18 +249,30 @@
 
 
 
-
     <script src="libraries/bootstrap.bundle.min.js"></script>
     <script>
-        const toggleIcon = document.getElementById('themeToggle');
+
+        const toggleButton = document.querySelector('#themeToggle');
+        const toggleIcon = document.querySelector('#themeToggle i'); // select the icon inside button
         const html = document.documentElement;
+
         function updateIcon() {
-            toggleIcon.className = html.getAttribute('data-bs-theme') === 'dark' ? 'bi bi-sun fs-3' : 'bi bi-moon-stars fs-3';
+            if (html.getAttribute('data-bs-theme') === 'dark') {
+                toggleIcon.className = 'bi bi-sun-fill fs-6'; // small icon
+                toggleButton.className = 'btn btn-sm btn-light';
+            } else {
+                toggleIcon.className = 'bi bi-moon-stars-fill fs-6'; // small icon
+                toggleButton.className = 'btn btn-sm btn-dark';
+            }
         }
+        // Load saved theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) html.setAttribute('data-bs-theme', savedTheme);
+
         updateIcon();
-        toggleIcon.addEventListener('click', () => {
+
+        // Toggle theme on click
+        document.getElementById('themeToggle').addEventListener('click', () => {
             const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
@@ -176,9 +280,8 @@
         });
     </script>
 
+
     <script>
-
-
         function Service() {
             var iconClassName = document.getElementById('Icon_RunService').className;
             window.ScriptContext.Service(iconClassName);
@@ -202,9 +305,5 @@
             }
         }
     </script>
-
-
-
-
 </body>
 </html>

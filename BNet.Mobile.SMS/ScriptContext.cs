@@ -12,6 +12,7 @@ using BNet.Mobile.SMS.Services.ForegroundServices;
 using BNet.Mobile.SMS.Services.TempDataServices;
 using Java.Interop;
 using System.Threading.Tasks;
+using static Android.Renderscripts.Sampler;
 
 
 namespace BNet.Mobile.SMS
@@ -84,6 +85,7 @@ namespace BNet.Mobile.SMS
 
 
             }
+            HtmlElement.Refresh();
         }
 
 
@@ -116,6 +118,7 @@ namespace BNet.Mobile.SMS
 
                 RemoveAttribute(HtmlElement.Button_SaveSettings, "disabled");
                 UpdateInnerHtml(HtmlElement.Button_SaveSettings, "Save changes");
+                HtmlElement.Refresh();
             });
         }
 
@@ -175,61 +178,71 @@ namespace BNet.Mobile.SMS
 
         public void UpdateValue(string id, string value)
         {
-            // Ensure we're on UI thread
-            webView.Post(() =>
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    value = value.Replace("'", "\\'");
-                    string js = $"document.getElementById('{id}').value = '{value}';";
-                    webView.EvaluateJavascript(js, null);
-                    HtmlElement.Refresh();
-                }
+            if (string.IsNullOrEmpty(value)) return;
 
+            // Offload heavy processing to a background task
+            Task.Run(() =>
+            {
+                // Escape single quotes in the value
+                string escapedValue = value.Replace("'", "\\'");
+                string js = $"document.getElementById('{id}').value = '{escapedValue}';";
+
+                // Only switch to UI thread for JS evaluation
+                webView.Post(() =>
+                {
+                    webView.EvaluateJavascript(js, null);
+                });
             });
         }
         public void UpdateInnerHtml(string id, string value)
         {
-            // Ensure we're on UI thread
-            webView.Post(() =>
+            if (string.IsNullOrEmpty(value)) return;
+
+            // Offload heavy processing to a background task
+            Task.Run(() =>
             {
-                if (!string.IsNullOrEmpty(value))
+                // Escape single quotes in the value
+                string escapedValue = value.Replace("'", "\\'");
+                string js = $"document.getElementById('{id}').innerHTML = '{escapedValue}';";
+
+                // Only switch to UI thread for JS evaluation
+                webView.Post(() =>
                 {
-                    value = value.Replace("'", "\\'");
-                    string js = $"document.getElementById('{id}').innerHTML = '{value}';";
                     webView.EvaluateJavascript(js, null);
-                    HtmlElement.Refresh();
-                }
+                });
             });
         }
 
         public void UpdateElementAttribute(string id, string attribute, string value)
         {
-            // Ensure we're on the UI thread
-            webView.Post(() =>
+            if (string.IsNullOrEmpty(value)) return;
+
+            // Offload heavy processing to a background task
+            Task.Run(() =>
             {
-                if (!string.IsNullOrEmpty(value))
+                // Escape single quotes in the value
+                string escapedValue = value.Replace("'", "\\'");
+                string js = $"document.getElementById('{id}').setAttribute('{attribute}', '{escapedValue}');";
+                // Only switch to UI thread for JS evaluation
+                webView.Post(() =>
                 {
-                    value = value.Replace("'", "\\'"); // Escape single quotes in the value
-                    string js = $"document.getElementById('{id}').setAttribute('{attribute}', '{value}');";
                     webView.EvaluateJavascript(js, null);
-                    HtmlElement.Refresh();
-                }
+                });
             });
         }
 
 
         public void RemoveAttribute(string id, string attribute)
         {
-            // Ensure we're on the UI thread
-            webView.Post(() =>
+            // Offload heavy processing to a background task
+            Task.Run(() =>
             {
-                if (!string.IsNullOrEmpty(attribute))
+                string js = $"document.getElementById('{id}').removeAttribute('{attribute}');";
+                // Only switch to UI thread for JS evaluation
+                webView.Post(() =>
                 {
-                    string js = $"document.getElementById('{id}').removeAttribute('{attribute}');";
                     webView.EvaluateJavascript(js, null);
-                    HtmlElement.Refresh();
-                }
+                });
             });
         }
 

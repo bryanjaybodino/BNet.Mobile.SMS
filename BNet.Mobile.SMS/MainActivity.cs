@@ -2,7 +2,7 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Content.Res;
+using Android.Net;
 using Android.OS;
 using Android.Runtime;
 using Android.Util;
@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Xamarin.Essentials;
 
 namespace BNet.Mobile.SMS
 {
@@ -35,19 +36,31 @@ namespace BNet.Mobile.SMS
     public class MainActivity : AppCompatActivity
     {
         // AD HOC PASSWORD : 123456
+
+        //REGISTER CUSTOM BROADCAST RECEIVER
+        private SmsDeliveryReceiver SmsDeliveryReceiver = new SmsDeliveryReceiver();
         protected override void OnRestart()
         {
-            HtmlElement.Refresh();
             base.OnRestart();
+            HtmlElement.Refresh(); 
         }
         protected override void OnResume()
         {
             base.OnResume();
+            // SMS receiver
+            RegisterReceiver(SmsDeliveryReceiver, new IntentFilter(SmsDeliveryReceiver.SMS_SENT));
+            HtmlElement.Refresh();
+        }
+        protected override void OnPause()
+        {
+            base.OnPause();
+            UnregisterReceiver(SmsDeliveryReceiver);
         }
         protected override void OnNewIntent(Intent intent)
         {
             Intent = intent;
             base.OnNewIntent(intent);
+            HtmlElement.Refresh();
         }
 
         protected override async void OnCreate(Bundle savedInstanceState)
@@ -58,12 +71,6 @@ namespace BNet.Mobile.SMS
 
             SetContentView(Resource.Layout.activity_main);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-
-            //REGISTER CUSTOM BROADCAST RECEIVER
-            SmsDeliveryReceiver receiver = new SmsDeliveryReceiver();
-            IntentFilter filter = new IntentFilter();
-            filter.AddAction("SMS_SENT");
-            RegisterReceiver(receiver, filter);
 
             // Copy the HTML file from assets to internal storage
             CopyAssetsToInternalStorage();
@@ -92,12 +99,7 @@ namespace BNet.Mobile.SMS
             await HtmlElement.Update(scriptContext);
 
             StartTimer(scriptContext);
-
         }
-
-
-
-
         // ✅ Handle the user's permission response
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {

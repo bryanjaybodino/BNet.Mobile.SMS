@@ -39,7 +39,6 @@ namespace BNet.Mobile.SMS
         {
             if (isRefresh)
             {
-                scriptContext.UpdateInnerHtml(Label_Connection, NetworkChecker.LocalConnection());
                 scriptContext.UpdateInnerHtml(Label_SentQueue, (await SendQueue.CountAsync()).ToString());
                 scriptContext.UpdateInnerHtml(Label_SentSuccess, (SendMessage.CountSent()).ToString());
                 scriptContext.UpdateInnerHtml(Label_SentFailed, (SendMessage.CountFailed()).ToString());
@@ -67,6 +66,10 @@ namespace BNet.Mobile.SMS
                     scriptContext.UpdateInnerHtml(Label_RunService, "Start Service");
                 }
                 isRefresh = false;
+            }
+            else
+            {
+                scriptContext.UpdateInnerHtml(Label_Connection, NetworkChecker.WebServerConnection());
             }
         }
 

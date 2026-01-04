@@ -16,38 +16,26 @@ namespace BNet.Mobile.SMS.Services.NetworkServices
 {
     internal class NetworkChecker
     {
-        public static int PortNumber()
+        public static int WebServerPortNumber()
         {
             return 8030;
         }
-        public static string IPAddress()
+        public static string WebServerConnection()
         {
-            WifiManager wifiMgr = (WifiManager)Android.App.Application.Context.GetSystemService(Context.WifiService);
-            WifiInfo wifiInfo = wifiMgr.ConnectionInfo;
-            int ip = wifiInfo.IpAddress;
-            return Formatter.FormatIpAddress(ip);
-        }
-        public static bool HasInternet()
-        {
-            bool isMobileDataEnabled = IsMobileDataEnabled(Android.App.Application.Context);
-            bool isWifiEnabled = IsWifiEnabled(Android.App.Application.Context);
-            if (isWifiEnabled)
+            string Hotspot = NetworkConnections.GetHotspotIpAddress();
+            string Wifi = NetworkConnections.GetWifiIpAddress();
+            if (Wifi != "0.0.0.0")
             {
-                return true;
+                return "http://" + Wifi + ":" + WebServerPortNumber();
             }
-            else if (isMobileDataEnabled)
+            else if (Hotspot != "127.0.0.1")
             {
-                return true;
+                return "http://" + Hotspot + ":" + WebServerPortNumber();
             }
             else
             {
-                return false;
+                return "No Connection Available";
             }
-        }
-
-        public static string LocalConnection()
-        {
-            return "http://" + IPAddress() + ":" + PortNumber();
         }
 
         static bool IsMobileDataEnabled(Context context)
@@ -72,6 +60,23 @@ namespace BNet.Mobile.SMS.Services.NetworkServices
                 return wifiManager != null && wifiManager.IsWifiEnabled;
             }
             catch
+            {
+                return false;
+            }
+        }
+        public static bool HasInternet()
+        {
+            bool isMobileDataEnabled = IsMobileDataEnabled(Android.App.Application.Context);
+            bool isWifiEnabled = IsWifiEnabled(Android.App.Application.Context);
+            if (isWifiEnabled)
+            {
+                return true;
+            }
+            else if (isMobileDataEnabled)
+            {
+                return true;
+            }
+            else
             {
                 return false;
             }

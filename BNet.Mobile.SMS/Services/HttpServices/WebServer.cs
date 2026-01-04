@@ -28,7 +28,7 @@ namespace BNet.Mobile.SMS.Services.HttpServices
             {
                 try
                 {
-                    int port = NetworkChecker.PortNumber();
+                    int port = NetworkChecker.WebServerPortNumber();
                     listener.Prefixes.Remove($"http://*:{port}/");
                     listener.Prefixes.Add($"http://*:{port}/");
                     listener.Start();

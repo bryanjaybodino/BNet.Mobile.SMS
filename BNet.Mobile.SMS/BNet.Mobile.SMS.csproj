@@ -52,14 +52,18 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AndroidPackageFormat>aab</AndroidPackageFormat>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
     <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <BundleAssemblies>false</BundleAssemblies>
+    <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+    <MandroidI18n />
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android.Export" />
@@ -91,6 +95,7 @@
     <Compile Include="Services\DatabaseServices\MySQLService.cs" />
     <Compile Include="Services\NetworkServices\NetworkChecker.cs" />
     <Compile Include="Services\ForegroundServices\ForegroundTasks.cs" />
+    <Compile Include="Services\NetworkServices\NetworkConnections.cs" />
     <Compile Include="Services\PermissionServices\MyPermission.cs" />
     <Compile Include="Services\ServiceBus\TimeTrigger.cs" />
     <Compile Include="Services\SmsServices\GetMessages.cs" />
@@ -135,7 +140,9 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_foreground.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\images\" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MySqlConnector">
       <Version>2.5.0</Version>

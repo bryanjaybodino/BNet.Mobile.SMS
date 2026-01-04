@@ -20,6 +20,7 @@ namespace BNet.Mobile.SMS.Services.BroadCastReceiverServices
     [IntentFilter(new[] { "SMS_SENT" })]
     public class SmsDeliveryReceiver : BroadcastReceiver
     {
+        public static string SMS_SENT = "SMS_SENT";
         public override void OnReceive(Context context, Intent intent)
         {
             var pendingResult = GoAsync();
