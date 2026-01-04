@@ -6,6 +6,7 @@
     <meta name="google" content="notranslate">
     <link href="libraries/bootstrap.min.css" rel="stylesheet" />
     <link href="libraries/bootstrap-icons.css" rel="stylesheet" />
+    <link href="libraries/prism.css" rel="stylesheet" />
     <style>
         html, body {
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -26,7 +27,7 @@
         <div class="d-flex justify-content-between mb-3">
             <div>
                 <h2 class="fw-bold mb-1">SMS Integration</h2>
-                <span class="fw-bold text-muted">API Connection : </span>
+                <span class="fw-bold text-muted">Endpoint : </span>
                 <small id="Label_Connection" class="text-muted">http://0.0.0.0:8030</small>
             </div>
             <div class="text-end">
@@ -76,12 +77,12 @@
             </div>
         </div>
 
-        <div class="card shadow-sm mb-2">
+        <div class="card shadow-sm mb-2" data-bs-toggle="modal" data-bs-target="#SmsDocsModal">
             <div class="card-body d-flex gap-2">
                 <i class="bi bi-file-earmark-text fs-3 text-info"></i>
                 <div class="flex-grow-1">
-                    <div class="fw-semibold">Instructions</div>
-                    <small class="text-muted">How to use service</small>
+                    <div class="fw-semibold">Documentation</div>
+                    <small class="text-muted">Learn how to use the SMS API and store data using MySQL.</small>
                 </div>
             </div>
         </div>
@@ -91,7 +92,7 @@
             <div class="card-body d-flex gap-2">
                 <i class="bi bi-gear fs-3 text-warning"></i>
                 <div class="flex-grow-1">
-                    <div class="fw-semibold">Settings</div>
+                    <div class="fw-semibold">Mysql Connection</div>
                     <small class="text-muted">Configure options</small>
                 </div>
             </div>
@@ -153,8 +154,10 @@
                             <div class="mb-2">
                                 <textarea class="form-control" id="Textbox_Connection" rows="8">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</textarea>
                                 <div class="form-text">
-                                    Enter your MySQL connection string.
+                                    Enter your MySQL connection string. Additional details and examples are available in the documentation.
                                 </div>
+
+
                             </div>
 
                         </div>
@@ -246,10 +249,240 @@
         </div>
     </div>
 
+    <!-- SMS API Documentation Modal -->
+    <div class="modal fade" id="SmsDocsModal" tabindex="-1"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+            <div class="modal-content bg-body text-body">
+
+
+                <!-- Header -->
+                <div class="modal-header border-0 pb-2">
+
+                    <div class="d-flex align-items-center flex-wrap gap-2 w-100">
+
+                        <!-- Title -->
+                        <h5 class="modal-title fw-bold me-3 mb-0">
+                            <i class="bi bi-journal-code me-2"></i>Documentation
+                        </h5>
+
+                        <!-- Documentation Navigation -->
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="#docs-api" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-send me-1"></i> SMS API
+                            </a>
+                            <a href="#docs-mysql" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-database me-1"></i> MySQL Storage
+                            </a>
+                        </div>
+
+                        <!-- Spacer -->
+                        <div class="ms-auto"></div>
+
+                        <!-- Close -->
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+
+                </div>
+
+
+                <!-- Body -->
+                <div class="modal-body d-flex justify-content-center overflow-auto">
+                    <div class="w-100" style="max-width: 800px;">
+
+                        <!-- Title -->
+                        <h2 id="docs-api" class="fw-bold text-center mb-4">SMS API Documentation</h2>
+
+                        <!-- Overview -->
+                        <p class="text-body-secondary">
+                            This API provides endpoints to <strong>check API status</strong>
+                            and <strong>send SMS messages</strong> using standard HTTP requests.
+                        </p>
+
+                        <!-- ================= STATUS CHECK ================= -->
+                        <h4 class="fw-bold mt-4">API Status Check</h4>
+
+                        <h6 class="fw-bold">Endpoint</h6>
+                        <div class="bg-body-secondary border rounded p-2 small text-body">
+                            <strong>GET</strong> <span class="Endpoints"></span>/status
+                        </div>
+
+                        <h6 class="fw-bold mt-3">Description</h6>
+                        <p class="small text-body-secondary">
+                            Checks whether the SMS API service is running and reachable.
+                        </p>
+
+                        <h6 class="fw-bold mt-3">JavaScript Example</h6>
+<pre>
+<code class="language-javascript">
+const checkStatus = async () => {
+    try {
+        const response = await fetch(API_BASE_URL + "/status");
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error("API is not reachable", error);
+    }
+};
+
+checkStatus();
+
+</code>
+</pre>
+
+                        <!-- ================= SEND SMS ================= -->
+                        <h4 class="fw-bold mt-5">Send SMS</h4>
+
+                        <h6 class="fw-bold">Endpoint</h6>
+                        <div class="bg-body-secondary border rounded p-2 small text-body">
+                            <strong>POST</strong> <span class="Endpoints"></span>/send
+                        </div>
+
+                        <h6 class="fw-bold mt-3">Request Headers</h6>
+<pre class="bg-body-tertiary border rounded p-2 small text-body">
+<code>
+Content-Type: application/json
+</code>
+</pre>
+
+                        <h6 class="fw-bold mt-3">Request Body</h6>
+                        <ul class="small">
+                            <li><strong>receiver</strong> – Recipient phone number</li>
+                            <li><strong>multiple recipients</strong> – separate numbers with commas "09123456789,09223334444"</li>
+                            <li><strong>message</strong> – SMS message content</li>
+
+                        </ul>
+                        <p class="fw-bold mb-1">JSON Example</p>
+<pre>
+<code class="language-json">
+{
+    "receiver": "09123456789,09223334444",
+    "message": "Hello World"
+}
+
+</code>
+</pre>
+
+                        <h6 class="fw-bold mt-3">JavaScript Example</h6>
+<pre>
+<code class="language-javascript">
+const payload = {
+    receiver: phoneNumber,
+    message: message
+};
+
+const sendSms = async () => {
+    try {
+        const response = await fetch(API_BASE_URL + "/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to send SMS");
+        }
+
+        const result = await response.json();
+        console.log("SMS sent successfully", result);
+    } catch (error) {
+        console.error("Error sending SMS", error);
+    }
+};
+
+sendSms();
+
+</code>
+</pre>
+
+                        <!-- Notes -->
+                        <h5 class="fw-bold mt-4">Notes</h5>
+                        <ul class="small text-body-secondary">
+                            <li>Ensure the API server is running before sending SMS.</li>
+                            <li>The device must have a valid SIM card configured.</li>
+                            <li>If hosted locally, client and server should be on the same network.</li>
+                        </ul>
+
+
+
+
+                        <!-- ================= MYSQL / SMS STORAGE ================= -->
+                        <hr class="my-5">
+
+                        <h3 id="docs-mysql" class="fw-bold">
+                            <i class="bi bi-database me-2"></i>
+                            Storing SMS to MySQL
+                        </h3>
+
+                        <p class="text-body-secondary">
+                            This guide explains how to configure MySQL so the application can
+                            store incoming SMS messages into your database.
+                        </p>
+
+                        <h5 class="fw-bold mt-4">Setup Instructions</h5>
+                        <ol class="text-body-secondary ps-3">
+                            <li>Install <strong>XAMPP</strong> and enable MySQL</li>
+                            <li>Turn off your Firewall (for local network access)</li>
+                            <li>Create any database name</li>
+                            <li>Select your database</li>
+                            <li>Open <strong>Privileges</strong></li>
+                            <li>Add a new user account</li>
+                        </ol>
+
+                        <h5 class="fw-bold mt-4">Login Information</h5>
+                        <ul class="small text-body-secondary ms-3">
+                            <li><strong>Username:</strong> Use text field → your credentials</li>
+                            <li><strong>Hostname:</strong> Any host → <code>%</code></li>
+                            <li><strong>Password:</strong> Optional</li>
+                        </ul>
+
+                        <h5 class="fw-bold mt-4">Database Permissions</h5>
+                        <p class="small text-body-secondary ms-3">
+                            Check <strong>Grant all privileges</strong> on your selected database.
+                        </p>
+
+                        <h5 class="fw-bold mt-4">Global Privileges</h5>
+                        <p class="small text-body-secondary ms-3">
+                            Enable <strong>all privileges</strong>.
+                        </p>
+
+                        <h5 class="fw-bold mt-4">MySQL Connection String</h5>
+                        <p class="small text-body-secondary">
+                            Copy and replace the credentials below in your application settings.
+                        </p>
+
+                        <div class="bg-body-tertiary border rounded p-2">
+<pre class="mb-0 small text-body">
+server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+
+                <!-- Footer -->
+                <div class="modal-footer border-0"></div>
+
+            </div>
+        </div>
+    </div>
+
+
+
 
 
 
     <script src="libraries/bootstrap.bundle.min.js"></script>
+    <script src="libraries/prism.js"></script>
     <script>
 
         const toggleButton = document.querySelector('#themeToggle');
@@ -304,6 +537,29 @@
                 window.ScriptContext.CreateDatabase(connectionString);
             }
         }
+    </script>
+
+
+    <script>
+
+        // Function to update all elements with the class "Endpoints"
+        function updateEndpoints() {
+            // Get all elements with class "Endpoints"
+            const endpoints = document.querySelectorAll('.Endpoints');
+            // Loop through each element and update its text
+            endpoints.forEach((el, index) => {
+                // Example: updating text with a timestamp
+                var currentConnection = document.getElementById('Label_Connection').innerHTML;
+                if (currentConnection == 'No Connection Available') {
+                    el.textContent = 'http://127.0.0.1';
+                }
+                else {
+                    el.textContent = currentConnection;
+                }
+            });
+        }
+        // Call the function every 2 seconds
+        setInterval(updateEndpoints, 1000);
     </script>
 </body>
 </html>

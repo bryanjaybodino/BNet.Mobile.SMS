@@ -76,7 +76,8 @@
 
             <textarea placeholder="Enter Your Message" id="message"></textarea>
 
-            <input class="btn" type="submit" value="send" onclick="SendMessage()" />
+            <input class="btn" type="submit" value="send" onclick="sendSms()" />
+            <div class="status" id="status"></div>
         </div>
     </div>
 
@@ -92,41 +93,46 @@
             .catch(() => writeToScreen("<span>ERROR: API Server is not running</span>"));
 
         /* ================= SEND MESSAGE ================= */
-        function SendMessage() {
-            var phoneNumber = document.getElementById('phoneNumber').value;
-            var message = document.getElementById('message').value;
+
+        const sendSms = async () => {
+            const phoneNumber = document.getElementById("phoneNumber").value;
+            const message = document.getElementById("message").value;
+            const status = document.getElementById("status");
 
             if (message.trim() !== '') {
 
-                var payload = {
+                const payload = {
                     receiver: phoneNumber,
                     message: message
                 };
+                status.textContent = "Sending...";
 
-                writeToScreen('<div class="message"><span>' + message + '</span></div>');
-
-                fetch(API_BASE_URL + "/send", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error();
-                        return response.json();
-                    })
-                    .then(() => {
-                        // Message successfully sent
-                    })
-                    .catch(() => {
-                        writeToScreen("<span>ERROR: Failed to send message</span>");
+                try {
+                    const response = await fetch(API_BASE_URL + "/send", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
                     });
+
+                    if (!response.ok) {
+                        throw new Error("Failed to send SMS");
+                    }
+
+                    const result = await response.json();
+                    status.textContent = "SMS sent successfully ✅";
+                    writeToScreen('<div class="message"><span>' + message + '</span></div>');
+                    console.log("SMS sent successfully", result);
+                } catch (error) {
+                    status.textContent = "Error sending SMS ❌";
+                    console.error("Error sending SMS", error);
+                }
 
                 document.getElementById('message').value = '';
                 document.getElementById('message').focus();
             }
-        }
+        };
 
         /* ================= OUTPUT ================= */
         function writeToScreen(message) {

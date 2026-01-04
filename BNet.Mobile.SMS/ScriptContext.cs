@@ -50,20 +50,32 @@ namespace BNet.Mobile.SMS
                 }
                 else
                 {
-                    UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
-                    UpdateInnerHtml(HtmlElement.Label_RunService, "Service is running");
-                    //ForegroundTasks.StartService();
-                    FloatingIcon.StartService();
+   
 
                     AlertDialog.Builder alert = new AlertDialog.Builder(context);
                     alert.SetCancelable(false);
                     alert.SetTitle("Message");
                     alert.SetMessage("The app is closing in order to run in the background.");
-                    alert.SetPositiveButton("Ok", (senderAlert, args) =>
+                    alert.SetPositiveButton("OK", (senderAlert, args) =>
                     {
+                        UpdateElementAttribute(HtmlElement.Icon_RunService, "class", "bi bi-stop-circle fs-3 text-danger");
+                        UpdateInnerHtml(HtmlElement.Label_RunService, "Service is running");
+                        //ForegroundTasks.StartService();
+                        FloatingIcon.StartService();
                         RecentTasks.RemoveAppFromRecentTasks();
                     });
-                    alert.Show();
+
+                    alert.SetNegativeButton("Cancel", (senderAlert, args) =>
+                    {
+                      
+                    });
+
+                    // Create and show the dialog
+                    AlertDialog dialog = alert.Create();
+                    dialog.Show();
+                    
+                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)dialog.GetButton((int)DialogButtonType.Positive).LayoutParameters;
+                    layoutParams.SetMargins(50, 0, 0, 0);
                 }
             }
             else

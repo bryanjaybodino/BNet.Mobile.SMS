@@ -163,6 +163,8 @@
     <AndroidAsset Include="Assets\libraries\bootstrap.bundle.min.js" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\libraries\prism.css" />
+    <AndroidAsset Include="Assets\libraries\prism.js" />
     <Content Include="index.html" />
     <AndroidResource Include="Resources\drawable\icon.png" />
   </ItemGroup>
