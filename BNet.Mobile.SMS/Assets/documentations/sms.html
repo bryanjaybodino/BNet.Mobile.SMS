@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../libraries/bootstrap.min.css" rel="stylesheet" />
+    <link href="../libraries/bootstrap-icons.css" rel="stylesheet" />
+    <link href="../libraries/prism.css" rel="stylesheet" />
+</head>
+
+<body class="pb-5">
+    <h3 class="mb-3">SMS API Documentation</h3>
+    <p class="text-body-secondary">
+        This API provides endpoints to <strong>check API status</strong>
+        and <strong>send SMS messages</strong> using standard HTTP requests.
+    </p>
+
+    <div class="w-100">
+
+
+
+        <!-- ================= STATUS CHECK ================= -->
+        <h4 class="fw-bold mt-4">API Status Check</h4>
+
+        <h6 class="fw-bold">Endpoint</h6>
+        <div class="bg-body-secondary border rounded p-2 small text-body">
+            <strong>GET</strong> <span class="Endpoints"></span>/status
+        </div>
+
+        <h6 class="fw-bold mt-3">Description</h6>
+        <p class="small text-body-secondary">
+            Checks whether the SMS API service is running and reachable.
+        </p>
+
+        <h6 class="fw-bold mt-3">JavaScript Example</h6>
+<pre>
+<code class="language-javascript">
+const checkStatus = async () => {
+    try {
+        const response = await fetch(API_BASE_URL + "/status");
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error("API is not reachable", error);
+    }
+};
+
+checkStatus();
+
+</code>
+</pre>
+
+        <!-- ================= SEND SMS ================= -->
+        <h4 class="fw-bold mt-5">Send SMS</h4>
+
+        <h6 class="fw-bold">Endpoint</h6>
+        <div class="bg-body-secondary border rounded p-2 small text-body">
+            <strong>POST</strong> <span class="Endpoints"></span>/send
+        </div>
+
+        <h6 class="fw-bold mt-3">Request Headers</h6>
+<pre class="bg-body-tertiary border rounded p-2 small text-body">
+<code>
+Content-Type: application/json
+</code>
+</pre>
+
+        <h6 class="fw-bold mt-3">Request Body</h6>
+        <ul class="small">
+            <li><strong>receiver</strong> – Recipient phone number</li>
+            <li><strong>message</strong> – SMS message content</li>
+        </ul>
+        <p class="small text-body-secondary">
+            <div><strong>Notes : </strong>For multiple recipients, separate the numbers with commas.</div>
+        </p>
+
+        <p class="fw-bold mb-1">JSON Example</p>
+<pre>
+<code class="language-json">
+{
+    "receiver": "09123456789,09223334444",
+    "message": "Hello World"
+}
+
+</code>
+</pre>
+
+        <h6 class="fw-bold mt-3">JavaScript Example</h6>
+<pre>
+<code class="language-javascript">
+const payload = {
+    receiver: phoneNumber,
+    message: message
+};
+
+const sendSms = async () => {
+    try {
+        const response = await fetch(API_BASE_URL + "/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to send SMS");
+        }
+
+        const result = await response.json();
+        console.log("SMS sent successfully", result);
+    } catch (error) {
+        console.error("Error sending SMS", error);
+    }
+};
+
+sendSms();
+
+</code>
+</pre>
+        <!-- Notes -->
+        <h5 class="fw-bold mt-4">Notes</h5>
+        <ul class="small text-body-secondary">
+            <li>Ensure the API server is running before sending SMS.</li>
+            <li>The device must have a valid SIM card configured.</li>
+            <li>If hosted locally, client and server should be on the same network.</li>
+        </ul>
+    </div>
+    <script src="../libraries/bootstrap.bundle.min.js"></script>
+    <script src="../libraries/prism.js"></script>
+</body>
+</html>

@@ -166,7 +166,10 @@
     <AndroidAsset Include="Assets\images\XamppStep1.png" />
     <AndroidAsset Include="Assets\images\XamppStep2.png" />
     <AndroidAsset Include="Assets\images\XamppStep3.png" />
-    <Content Include="index.html" />
+    <AndroidAsset Include="Assets\documentations\playground.html" />
+    <AndroidAsset Include="Assets\documentations\sms.html" />
+    <AndroidAsset Include="Assets\documentations\database.html" />
+    <AndroidAsset Include="Assets\documentations\index.html" />
     <AndroidResource Include="Resources\drawable\icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SMS Playground</title>
+    <link href="../libraries/bootstrap.min.css" rel="stylesheet" />
+    <link href="../libraries/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-white">
+        <h3 class="mb-0">📩 SMS Playground</h3>
+        <span id="apiStatus" class="badge bg-secondary fs-6">Checking API...</span>
+    </div>
+
+    <!-- Container -->
+    <div class="d-flex flex-column flex-grow-1 p-3">
+
+        <!-- Output console -->
+        <div id="output" class="flex-grow-1 border rounded p-3 mb-3 overflow-auto bg-white"></div>
+
+        <!-- Inputs -->
+        <input id="phoneNumber" type="text" class="form-control mb-2" placeholder="Receiver phone number" value="09614348390">
+        <textarea id="message" class="form-control mb-2" rows="3" placeholder="Type your message"></textarea>
+
+        <!-- Send button -->
+        <button class="btn btn-primary w-100 mb-2" onclick="sendSms()">
+            <i class="bi bi-send"></i> Send SMS
+        </button>
+
+        <!-- Status -->
+        <div id="status" class="text-center small text-secondary"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "http://192.168.1.5:8030";
+        const apiStatus = document.getElementById("apiStatus");
+        const output = document.getElementById("output");
+
+        async function checkApi() {
+            try {
+                const res = await fetch(API_BASE_URL + "/status");
+                if (!res.ok) throw new Error();
+                apiStatus.textContent = "API Online";
+                apiStatus.className = "badge bg-success fs-6";
+            } catch {
+                apiStatus.textContent = "API Offline";
+                apiStatus.className = "badge bg-danger fs-6";
+            }
+        }
+
+        checkApi();
+
+        async function sendSms() {
+            const phone = document.getElementById("phoneNumber").value;
+            const messageInput = document.getElementById("message");
+            const message = messageInput.value.trim();
+            const status = document.getElementById("status");
+
+            if (!message) return;
+
+            status.textContent = "Sending...";
+
+            try {
+                const res = await fetch(API_BASE_URL + "/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ receiver: phone, message })
+                });
+
+                if (!res.ok) throw new Error();
+
+                const msgDiv = document.createElement("div");
+                msgDiv.className = "text-end mb-2";
+                msgDiv.innerHTML = `<span class="badge bg-primary">${message}</span>`;
+                output.appendChild(msgDiv);
+                output.scrollTop = output.scrollHeight;
+
+                status.textContent = "SMS sent successfully ✓";
+            } catch {
+                status.textContent = "Failed to send SMS ❌";
+            }
+
+            messageInput.value = "";
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../libraries/bootstrap.min.css" rel="stylesheet" />
+    <link href="../libraries/bootstrap-icons.css" rel="stylesheet" />
+    <link href="../libraries/prism.css" rel="stylesheet" />
+</head>
+
+<body class="pb-5">
+    <h3 class="mb-3">Storing SMS to MySQL</h3>
+    <p class="text-body-secondary">
+        This guide explains how to configure MySQL so the application can
+        store incoming SMS messages into your database.
+    </p>
+
+    <h5 class="fw-bold mt-4">Setup Instructions</h5>
+    <ol class="text-body-secondary ps-3">
+        <li>Install <strong>XAMPP</strong> and enable MySQL</li>
+        <li>Turn off your Firewall (for local network access)</li>
+        <li>Create any database name</li>
+        <li>Select your database</li>
+        <li>Open <strong>Privileges</strong></li>
+        <li>Add a new user account</li>
+    </ol>
+
+    <h5 class="fw-bold mt-4">Login Information</h5>
+    <ul class="small text-body-secondary ms-3">
+        <li><strong>Username:</strong> Use text field → your credentials</li>
+        <li><strong>Hostname:</strong> Any host → <code>%</code></li>
+        <li><strong>Password:</strong> Optional</li>
+    </ul>
+    <div>
+        <img class="img-fluid" src="../images/XamppStep1.png" />
+    </div>
+
+
+
+    <h5 class="fw-bold mt-4">Database Permissions</h5>
+    <p class="small text-body-secondary ms-3">
+        Check <strong>Grant all privileges</strong> on your selected database.
+    </p>
+    <div>
+        <img class="img-fluid" src="../images/XamppStep2.png" />
+    </div>
+
+
+    <h5 class="fw-bold mt-4">Global Privileges</h5>
+    <p class="small text-body-secondary ms-3">
+        Enable <strong>all privileges</strong>.
+    </p>
+    <div>
+        <img class="img-fluid" src="../images/XamppStep3.png" />
+    </div>
+
+
+    <h5 class="fw-bold mt-4">MySQL Connection String</h5>
+    <p class="small text-body-secondary">
+        Copy and replace the credentials below in your application settings.
+    </p>
+
+    <div class="bg-body-tertiary border rounded p-2">
+<pre class="mb-0 small text-body">
+server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database
+</pre>
+    </div>
+    <script src="../libraries/bootstrap.bundle.min.js"></script>
+    <script src="../libraries/prism.js"></script>
+</body>
+</html>

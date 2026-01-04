@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMS API Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="../libraries/bootstrap.min.css" rel="stylesheet" />
+    <link href="../libraries/bootstrap-icons.css" rel="stylesheet" />
+    <link href="../libraries/prism.css" rel="stylesheet" />
+
+
+    <style>
+        #main {
+            height: 100vh;
+            overflow: hidden;
+        }
+        @media (max-width: 768px) {
+            #main {
+                z-index: 1;
+                position: fixed;
+                top:50px;
+            }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- MOBILE TOGGLE BUTTON -->
+            <div class="d-md-none p-2 border-bottom" style="position: relative; z-index: 10;">
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+
+            <!-- DESKTOP SIDEBAR -->
+            <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light border-end vh-100 p-3">
+                <h5 class="mb-3"><i class="bi bi-book"></i> Documentation</h5>
+                <ul class="nav flex-column gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-url="playground.html"><i class="bi bi-chat-dots"></i> Playground</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#" data-url="sms.html"><i class="bi bi-send"></i> SMS API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#" data-url="database.html"><i class="bi bi-database"></i> Database</a>
+                    </li>
+                </ul>
+            </nav>
+
+
+            <!-- MAIN CONTENT -->
+            <div class="col d-flex p-0" id="main">
+                <div class="container px-3 pt-5">
+                    <iframe id="contentFrame"
+                            src="playground.html"
+                            class="w-100 flex-grow-1 border-0"
+                            style="height: 100%; overflow: hidden;"></iframe>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MOBILE OFFCANVAS SIDEBAR -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Documentation</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#" data-url="playground.html"><i class="bi bi-chat-dots"></i> Playground</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-url="sms-api.html"><i class="bi bi-send"></i> SMS API</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#" data-url="database.html"><i class="bi bi-database"></i> Database</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="../libraries/bootstrap.bundle.min.js"></script>
+    <script src="../libraries/prism.js"></script>
+
+    <script>
+        // Navigation links
+        const links = document.querySelectorAll(".nav-link[data-url]");
+        const iframe = document.getElementById("contentFrame");
+
+        links.forEach(link => {
+            link.addEventListener("click", e => {
+                e.preventDefault();
+
+                // Update iframe
+                iframe.src = link.dataset.url;
+
+                // Update active class
+                links.forEach(l => {
+                    l.classList.remove("active");
+                    l.classList.add("text-dark");
+                });
+                link.classList.add("active");
+                link.classList.remove("text-dark");
+
+                // Close mobile sidebar if open
+                const offcanvasEl = document.getElementById('offcanvasSidebar');
+                const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+                if (bsOffcanvas) bsOffcanvas.hide();
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Content.Res;
 using Android.Net;
 using Android.OS;
 using Android.Runtime;
@@ -42,7 +43,7 @@ namespace BNet.Mobile.SMS
         protected override void OnRestart()
         {
             base.OnRestart();
-            HtmlElement.Refresh(); 
+            HtmlElement.Refresh();
         }
         protected override void OnResume()
         {
@@ -74,6 +75,8 @@ namespace BNet.Mobile.SMS
 
             // Copy the HTML file from assets to internal storage
             CopyAssetsToInternalStorage();
+            //CopyAssetsToExternalStorage();
+
 
             //Full Screen Application
             FullScreen();
@@ -92,7 +95,7 @@ namespace BNet.Mobile.SMS
             var scriptContext = new ScriptContext(this, webView);
             webView.AddJavascriptInterface(scriptContext, "ScriptContext");
             WebView.SetWebContentsDebuggingEnabled(true);                   // Enable debugging (Logcat or Chrome DevTools)
-            webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page
+            webView.LoadUrl($"file:///android_asset/BNet.Mobile.SMS.html"); // Default Landing Page    file:///android_asset/ -> ASSETS FOLDER
 
 
             HtmlElement.Refresh();
@@ -191,6 +194,44 @@ namespace BNet.Mobile.SMS
 
             }
         }
+
+        void CopyAssetFolder(string assetDir, string targetDir)
+        {
+            var assets = Assets;
+            var files = assets.List(assetDir);
+
+            if (files.Length == 0)
+            {
+                // It's a file
+                using var assetStream = assets.Open(assetDir);
+                using var fileStream = new FileStream(targetDir, FileMode.Create);
+                assetStream.CopyTo(fileStream);
+                return;
+            }
+
+            // It's a directory
+            if (!Directory.Exists(targetDir))
+                Directory.CreateDirectory(targetDir);
+
+            foreach (var file in files)
+            {
+                CopyAssetFolder(
+                    Path.Combine(assetDir, file),
+                    Path.Combine(targetDir, file)
+                );
+            }
+        }
+        void CopyAssetsToExternalStorage()
+        {
+            string publicRoot = Android.OS.Environment
+            .GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads)
+            .AbsolutePath;
+            CopyAssetFolder("images", Path.Combine(publicRoot, "images"));
+            CopyAssetFolder("documentations", Path.Combine(publicRoot, "documentations"));
+            CopyAssetFolder("libraries", Path.Combine(publicRoot, "libraries"));
+        }
+
+
         private void FullScreen()
         {
             var decorView = Window.DecorView;
