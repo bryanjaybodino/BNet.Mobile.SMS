@@ -140,9 +140,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_foreground.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\images\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="MySqlConnector">
       <Version>2.5.0</Version>
@@ -165,6 +163,9 @@
   <ItemGroup>
     <AndroidAsset Include="Assets\libraries\prism.css" />
     <AndroidAsset Include="Assets\libraries\prism.js" />
+    <AndroidAsset Include="Assets\images\XamppStep1.png" />
+    <AndroidAsset Include="Assets\images\XamppStep2.png" />
+    <AndroidAsset Include="Assets\images\XamppStep3.png" />
     <Content Include="index.html" />
     <AndroidResource Include="Resources\drawable\icon.png" />
   </ItemGroup>
