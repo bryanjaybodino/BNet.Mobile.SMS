@@ -109,18 +109,30 @@
             </div>
         </div>
 
-        <!-- Service Status -->
-        <!--<div class="card shadow-sm">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="fw-semibold">Service Status</div>
-                    <small class="text-muted">Enable / Disable</small>
-                </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" checked>
+        <div class="card shadow-sm mb-2" onclick="playgroundAlert()" style="cursor:pointer;">
+            <div class="card-body d-flex gap-2">
+                <i class="bi bi-laptop fs-3 text-primary"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">SMS Playground</div>
+                    <small class="text-muted">Test the SMS API live on your PC</small>
+                    <span class="badge bg-secondary text-white Endpoints"></span>
                 </div>
             </div>
-        </div>-->
+        </div>
+
+
+        <!-- Service Status -->
+        <!--<div class="card shadow-sm">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">Service Status</div>
+                <small class="text-muted">Enable / Disable</small>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" checked>
+            </div>
+        </div>
+    </div>-->
     </div>
 
     <!-- Settings Modal -->
@@ -297,11 +309,9 @@
                 <!-- Body -->
                 <div class="modal-body d-flex justify-content-center overflow-auto">
                     <div class="w-100" style="max-width: 800px;">
-
-                        <!-- Title -->
-                        <h2 id="docs-api" class="fw-bold text-center mb-4">SMS API Documentation</h2>
-
-                        <!-- Overview -->
+                  
+                        
+                        <h3 id="docs-api" class="mb-3">SMS API Documentation</h3>
                         <p class="text-body-secondary">
                             This API provides endpoints to <strong>check API status</strong>
                             and <strong>send SMS messages</strong> using standard HTTP requests.
@@ -416,16 +426,10 @@ sendSms();
                         </ul>
 
 
-
-
                         <!-- ================= MYSQL / SMS STORAGE ================= -->
                         <hr class="my-5">
 
-                        <h3 id="docs-mysql" class="fw-bold">
-                            <i class="bi bi-database me-2"></i>
-                            Storing SMS to MySQL
-                        </h3>
-
+                        <h3 id="docs-mysql" class="mb-3">Storing SMS to MySQL</h3>
                         <p class="text-body-secondary">
                             This guide explains how to configure MySQL so the application can
                             store incoming SMS messages into your database.

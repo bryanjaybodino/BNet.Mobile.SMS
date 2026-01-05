@@ -19,10 +19,10 @@
     <div class="d-flex flex-column flex-grow-1 p-3">
 
         <!-- Output console -->
-        <div id="output" class="flex-grow-1 border rounded p-3 mb-3 overflow-auto bg-white"></div>
+        <div id="output" class="flex-grow-1 border  p-3 mb-3 overflow-auto"></div>
 
         <!-- Inputs -->
-        <input id="phoneNumber" type="text" class="form-control mb-2" placeholder="Receiver phone number" value="09614348390">
+        <input id="phoneNumber" type="text" class="form-control mb-2" placeholder="091xxxx,092xxxx">
         <textarea id="message" class="form-control mb-2" rows="3" placeholder="Type your message"></textarea>
 
         <!-- Send button -->
@@ -35,7 +35,12 @@
     </div>
 
     <script>
-        const API_BASE_URL = "http://192.168.1.5:8030";
+        const protocol = window.location.protocol; // 'http:' or 'https:'
+        const hostname = window.location.hostname; // only domain
+        const port = window.location.port;         // only port (empty if default)
+        const host = port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
+
+        const API_BASE_URL = host
         const apiStatus = document.getElementById("apiStatus");
         const output = document.getElementById("output");
 
@@ -74,7 +79,7 @@
 
                 const msgDiv = document.createElement("div");
                 msgDiv.className = "text-end mb-2";
-                msgDiv.innerHTML = `<span class="badge bg-primary">${message}</span>`;
+                msgDiv.innerHTML = `<span style="font-size:17px" class="badge bg-primary">${message}</span>`;
                 output.appendChild(msgDiv);
                 output.scrollTop = output.scrollHeight;
 
