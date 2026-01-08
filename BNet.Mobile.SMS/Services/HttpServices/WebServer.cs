@@ -2,8 +2,8 @@
 using BNet.Mobile.SMS.Services.NetworkServices;
 using BNet.Mobile.SMS.Services.TempDataServices;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +12,8 @@ namespace BNet.Mobile.SMS.Services.HttpServices
 {
     public class WebServer
     {
-        static readonly HttpListener listener = new HttpListener();
+        private static readonly HttpListener listener = new HttpListener();
+        private static HashSet<string> _assetCache;
 
         public static void Start()
         {
@@ -21,22 +22,20 @@ namespace BNet.Mobile.SMS.Services.HttpServices
                 try
                 {
                     int port = NetworkChecker.WebServerPortNumber();
-
-                    listener.Prefixes.Clear();
+                    BuildAssetCache();
                     listener.Prefixes.Add($"http://*:{port}/");
                     listener.Start();
-
                     Console.WriteLine($"WebServer started on port {port}");
-
+                    // IMPORTANT: Sequential handling (no fire-and-forget)
                     while (listener.IsListening)
                     {
                         var context = await listener.GetContextAsync();
-                        _ = HandleRequestAsync(context);
+                        await HandleRequestAsync(context);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"WebServer error: {ex.Message}");
+                    Console.WriteLine($"WebServer error: {ex}");
                 }
             });
         }
@@ -45,6 +44,8 @@ namespace BNet.Mobile.SMS.Services.HttpServices
         {
             var request = context.Request;
             var response = context.Response;
+
+            response.KeepAlive = false;
 
             try
             {
@@ -56,11 +57,10 @@ namespace BNet.Mobile.SMS.Services.HttpServices
                 if (request.HttpMethod == "OPTIONS")
                 {
                     response.StatusCode = 200;
-                    response.Close();
                     return;
                 }
 
-                // ===== API ROUTES =====
+                // ===== API =====
                 if (request.HttpMethod == "GET" && request.Url.AbsolutePath == "/status")
                 {
                     await WriteJson(response, 200, "{\"status\":\"alive\"}");
@@ -79,18 +79,12 @@ namespace BNet.Mobile.SMS.Services.HttpServices
                     return;
                 }
 
-                // ===== STATIC FILE ROUTING =====
-                // Get the asset path
+                // ===== STATIC FILES =====
                 string assetPath = request.Url.AbsolutePath.TrimStart('/');
-
-                // SPA fallback: serve index.html for "/"
                 if (string.IsNullOrEmpty(assetPath))
                     assetPath = "index.html";
 
-                // Check if file exists in Assets
-                bool exists = AssetExists(assetPath);
-
-                if (exists)
+                if (_assetCache.Contains(assetPath))
                 {
                     string contentType = GetContentType(assetPath);
                     await ServeAssetFile(response, assetPath, contentType);
@@ -102,79 +96,76 @@ namespace BNet.Mobile.SMS.Services.HttpServices
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Request error: {ex.Message}");
+                Console.WriteLine($"Request error: {ex}");
                 response.StatusCode = 500;
             }
             finally
             {
-                response.Close();
+                try { response.OutputStream.Close(); } catch { }
+                try { response.Close(); } catch { }
             }
         }
 
-        // ===== HELPER: Check if asset exists =====
-        private static bool AssetExists(string assetPath)
+        // ===== ASSET CACHE =====
+        private static void BuildAssetCache()
         {
-            string dir = Path.GetDirectoryName(assetPath) ?? "";
-            string file = Path.GetFileName(assetPath);
+            _assetCache = new HashSet<string>();
 
-            try
+            void ScanDir(string path)
             {
-                var files = Application.Context.Assets.List(dir);
-                return files.Contains(file);
+                foreach (var file in Application.Context.Assets.List(path))
+                {
+                    string full = string.IsNullOrEmpty(path) ? file : $"{path}/{file}";
+
+                    try
+                    {
+                        Application.Context.Assets.Open(full).Close();
+                        _assetCache.Add(full);
+                    }
+                    catch
+                    {
+                        ScanDir(full);
+                    }
+                }
             }
-            catch
-            {
-                return false;
-            }
+
+            ScanDir("");
         }
 
-        // ===== HELPER: Serve an asset file =====
+        // ===== STREAM FILE (NO MEMORY BUFFERING) =====
         private static async Task ServeAssetFile(HttpListenerResponse response, string assetPath, string contentType)
         {
-            try
-            {
-                using var assetStream = Application.Context.Assets.Open(assetPath);
-                using var memoryStream = new MemoryStream();
-                await assetStream.CopyToAsync(memoryStream);
-                byte[] content = memoryStream.ToArray();
+            response.ContentType = contentType;
 
-                response.ContentType = contentType;
-                response.ContentLength64 = content.Length;
-                await response.OutputStream.WriteAsync(content, 0, content.Length);
-            }
-            catch (FileNotFoundException)
-            {
-                response.StatusCode = 404;
-            }
+            using var assetStream = Application.Context.Assets.Open(assetPath);
+            await assetStream.CopyToAsync(response.OutputStream);
         }
 
-        // ===== HELPER: Write JSON response =====
+        // ===== JSON RESPONSE =====
         private static async Task WriteJson(HttpListenerResponse response, int statusCode, string json)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(json);
             response.ContentType = "application/json";
             response.StatusCode = statusCode;
-            response.ContentLength64 = buffer.Length;
             await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
         }
 
-        // ===== HELPER: Content type detection =====
+        // ===== CONTENT TYPE =====
         private static string GetContentType(string filePath)
         {
-            string ext = Path.GetExtension(filePath).ToLower();
-            return ext switch
+            return Path.GetExtension(filePath).ToLower() switch
             {
                 ".html" => "text/html",
                 ".css" => "text/css",
                 ".js" => "application/javascript",
                 ".json" => "application/json",
+                ".png" => "image/png",
                 ".jpg" => "image/jpeg",
                 ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
                 ".gif" => "image/gif",
                 ".svg" => "image/svg+xml",
                 ".ico" => "image/x-icon",
-                _ => "application/octet-stream",
+                _ => "application/octet-stream"
             };
         }
     }

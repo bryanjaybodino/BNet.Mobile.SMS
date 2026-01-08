@@ -5,6 +5,7 @@ using Android.Runtime;
 using Android.Telephony;
 using Android.Views;
 using Android.Widget;
+using BNet.Mobile.SMS.Services.BroadCastReceiverServices;
 using BNet.Mobile.SMS.Services.HttpServices.Models;
 using BNet.Mobile.SMS.Services.TempDataServices;
 using Newtonsoft.Json;
@@ -52,7 +53,7 @@ namespace BNet.Mobile.SMS.Services.SmsServices
                             IList<PendingIntent> deliveredIntents = new List<PendingIntent>();
 
 
-                            Intent sentIntent = new Intent("SMS_SENT");
+                            Intent sentIntent = new Intent(SmsDeliveryReceiver.SMS_SENT);
                             sentIntent.PutExtra("receiver", receiver);
                             sentIntent.PutExtra("message", message);
                             PendingIntent sentPending = PendingIntent.GetBroadcast(

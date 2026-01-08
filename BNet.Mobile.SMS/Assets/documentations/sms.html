@@ -128,5 +128,20 @@ sendSms();
     </div>
     <script src="../libraries/bootstrap.bundle.min.js"></script>
     <script src="../libraries/prism.js"></script>
+    <script>
+      const protocol = window.location.protocol; // 'http:' or 'https:'
+      const hostname = window.location.hostname; // only domain
+      const port = window.location.port;         // only port (empty if default)
+      const host = port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
+      // Get all elements with class "Endpoints"
+      const endpoints = document.querySelectorAll('.Endpoints');
+      // Loop through each element and update its text
+      endpoints.forEach((el, index) => {
+          el.textContent = host;
+      });
+    </script>
+
+
+
 </body>
 </html>
