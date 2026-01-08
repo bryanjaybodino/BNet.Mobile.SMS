@@ -50,7 +50,7 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
 
             // ✅ Handle PendingIntent flags for Android 12+
             PendingIntentFlags pendingIntentFlags = PendingIntentFlags.UpdateCurrent;
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+            if ((int)Build.VERSION.SdkInt >= 30)
             {
                 pendingIntentFlags |= PendingIntentFlags.Immutable;
             }

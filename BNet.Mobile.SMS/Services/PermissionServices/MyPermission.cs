@@ -18,7 +18,7 @@ namespace BNet.Mobile.SMS.Services.PermissionServices
             Manifest.Permission.SendSms,
             Manifest.Permission.ReceiveSms,
             Manifest.Permission.ReadSms,
-            Manifest.Permission.PostNotifications //"android.permission.POST_NOTIFICATIONS"
+            "android.permission.POST_NOTIFICATIONS"
         };
 
         public MyPermission(Activity activity)
