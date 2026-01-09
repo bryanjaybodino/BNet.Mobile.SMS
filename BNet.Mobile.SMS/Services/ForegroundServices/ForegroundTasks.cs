@@ -92,15 +92,38 @@ namespace BNet.Mobile.SMS.Services.ForegroundServices
             Properties.SetIsBackgroundService(false);
 
         }
+
+        private System.Timers.Timer _timer;
+
         public override void OnCreate()
         {
-            WebServer.Start();
             base.OnCreate();
+            WebServer.Start();
+            _timer = new System.Timers.Timer(1000); // 500 ms
+            _timer.AutoReset = true;
+            _timer.Elapsed += OnTimerElapsed;
+            _timer.Start();
         }
+
+        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            TimeTrigger.ProcessSendingMessages();
+            TimeTrigger.ProcessSavingMessages();
+        }
+
         public override void OnDestroy()
         {
+            // Stop and clean up timer
+            if (_timer != null)
+            {
+                _timer.Stop();
+                _timer.Elapsed -= OnTimerElapsed;
+                _timer.Dispose();
+                _timer = null;
+            }
+
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
-            notificationManager.Cancel(1002); // SAME ID as StartForeground
+            notificationManager.Cancel(1002);
             StopForeground(true);
             Properties.SetIsBackgroundService(false);
             base.OnDestroy();

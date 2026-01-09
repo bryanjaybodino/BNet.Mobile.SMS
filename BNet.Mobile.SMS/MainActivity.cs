@@ -132,7 +132,7 @@ namespace BNet.Mobile.SMS
             await Task.Run(() =>
             {
                 // create a timer
-                Timer timer = new Timer(500); // 1000ms = 1 second
+                Timer timer = new Timer(1000); // 1000ms = 1 second
                 timer.Elapsed += (sender, e) =>
                 {
                     // Switch to UI thread
