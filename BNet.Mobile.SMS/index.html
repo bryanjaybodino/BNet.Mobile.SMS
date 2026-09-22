@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android SMS Gateway API | Free Local SMS Server</title>
+    <!-- Tailwind CSS -->
+    <script src="./Public/tailwindcss.js"></script>
+    <!-- FontAwesome Icons -->
+    <link href="./Public/font-awesome.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="./Public/fonts.googleapis.css?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            purple: '#8b5cf6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter',sans-serif;
+            transition: background-color 0.3s ease,color 0.3s ease
+        }
+
+        .dark body {
+            background-color: #090d16;
+            color: #f1f5f9
+        }
+
+        .light body {
+            background-color: #f8fafc;
+            color: #0f172a
+        }
+
+        .cyber-grid {
+            background-size: 36px 36px
+        }
+
+        .dark .cyber-grid {
+            background-image: linear-gradient(to right,rgb(255 255 255 / .03) 1px,transparent 1px),linear-gradient(to bottom,rgb(255 255 255 / .03) 1px,transparent 1px)
+        }
+
+        .light .cyber-grid {
+            background-image: linear-gradient(to right,rgb(15 23 42 / .03) 1px,transparent 1px),linear-gradient(to bottom,rgb(15 23 42 / .03) 1px,transparent 1px)
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #090d16
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px
+        }
+
+        .light .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9
+        }
+
+        .light .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px
+        }
+
+        .messenger-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: auto;
+            height: 50px;
+            padding: 0 15px;
+            background: linear-gradient(135deg,#2563eb,#1d4ed8);
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgb(37 99 235 / .4);
+            transition: all 0.3s ease;
+            z-index: 5000;
+            line-height: 1;
+            color: #fff;
+            cursor: pointer
+        }
+
+            .messenger-button i {
+                font-size: 1.5rem
+            }
+
+            .messenger-button span {
+                font-size: .95rem;
+                font-weight: 600;
+                white-space: nowrap
+            }
+
+            .messenger-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgb(37 99 235 / .6)
+            }
+
+            .messenger-button:active {
+                transform: scale(.95)
+            }
+
+        [data-theme="dark"] .messenger-button {
+            background: linear-gradient(135deg,#3b82f6,#2563eb);
+            box-shadow: 0 4px 12px rgb(37 99 235 / .6)
+        }
+
+            [data-theme="dark"] .messenger-button:hover {
+                box-shadow: 0 8px 20px rgb(59 130 246 / .7)
+            }
+
+        .messenger-button .icon-default, .messenger-button .text-default {
+            display: inline
+        }
+
+        .messenger-button .icon-loading {
+            display: none;
+            animation: spin 1s linear infinite
+        }
+
+        .messenger-button.loading .icon-default, .messenger-button.loading .text-default {
+            display: none
+        }
+
+        .messenger-button.loading .icon-loading {
+            display: inline
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .messenger-button .text-loading {
+            display: none;
+            cursor: pointer;
+            font-size: .8rem
+        }
+
+        .messenger-button.loading .text-loading {
+            display: inline
+        }
+
+            .messenger-button.loading .text-loading:hover::after {
+                content: ' (click to close)';
+                font-size: .7rem
+            }
+    </style>
+</head>
+<body class="custom-scrollbar overflow-x-hidden">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-md dark:bg-[#090d16]/80 bg-white/80 border-b dark:border-slate-800 border-slate-200 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-cyan-500/20">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl font-bold tracking-tight dark:text-white text-slate-900">Android<span class="text-cyan-500">.SMS.API</span></span>
+                        </div>
+                        <span class="block text-[10px] font-mono tracking-widest text-slate-400 uppercase -mt-0.5">Gateway Engine v1.0</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center gap-8 text-sm font-medium dark:text-slate-300 text-slate-600">
+                    <a href="#overview" class="hover:text-cyan-500 transition-colors">Overview</a>
+                    <a href="#screenshots" class="hover:text-cyan-500 transition-colors">App Preview</a>
+                    <a href="#endpoints" class="hover:text-cyan-500 transition-colors">SMS Endpoints</a>
+                    <a href="#database" class="hover:text-cyan-500 transition-colors">MySQL Integration</a>
+                    <a href="#features" class="hover:text-cyan-500 transition-colors">Features</a>
+                    <a href="#download" class="hover:text-cyan-500 transition-colors">Download App</a>
+                </nav>
+
+                <!-- Light / Dark Mode Toggle & Download Button -->
+                <div class="flex items-center gap-3">
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2.5 rounded-xl dark:bg-slate-800/80 bg-slate-100 dark:text-amber-400 text-slate-700 hover:opacity-80 border dark:border-slate-700 border-slate-300 transition-all" title="Toggle Theme">
+                        <i id="themeIcon" class="fa-solid fa-moon text-base"></i>
+                    </button>
+
+                    <a href="#download" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 rounded-xl hover:brightness-110 transition-all shadow-md shadow-cyan-500/20">
+                        <i class="fa-solid fa-download"></i> Download App
+                    </a>
+
+                    <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-b dark:border-slate-800 border-slate-200 dark:bg-[#0c111d] bg-white px-4 pt-2 pb-6 space-y-3">
+            <a href="#overview" class="block py-2 text-sm dark:text-slate-300 text-slate-700 hover:text-cyan-500">Overview</a>
+            <a href="#screenshots" class="block py-2 text-sm dark:text-slate-300 text-slate-700 hover:text-cyan-500">App Preview</a>
+            <a href="#endpoints" class="block py-2 text-sm dark:text-slate-300 text-slate-700 hover:text-cyan-500">SMS Endpoints</a>
+            <a href="#database" class="block py-2 text-sm dark:text-slate-300 text-slate-700 hover:text-cyan-500">MySQL Integration</a>
+            <a href="#features" class="block py-2 text-sm dark:text-slate-300 text-slate-700 hover:text-cyan-500">Features List</a>
+            <a href="#download" class="block py-2 text-sm text-cyan-500 font-bold">Download Android APK</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="overview" class="relative pt-12 pb-20 lg:pt-20 lg:pb-24 cyber-grid">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto space-y-6">
+
+                <!-- Free Banner Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full dark:bg-emerald-950/60 bg-emerald-50 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+                    <i class="fa-solid fa-bolt text-sm"></i> 100% Free Forever & Unlimited Local SMS Server
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight dark:text-white text-slate-900 leading-tight">
+                    Turn Your Android Phone into an <br class="hidden sm:inline">
+                    <span class="bg-gradient-to-r from-cyan-500 via-emerald-500 to-purple-500 bg-clip-text text-transparent">
+                        HTTP SMS Gateway & Server
+                    </span>
+                </h1>
+
+                <p class="text-sm sm:text-lg dark:text-slate-400 text-slate-600 font-normal leading-relaxed">
+                    Send single or bulk SMS messages using your own SIM card load without third-party fees. Connect your local Android phone server to your MySQL database to automatically store incoming messages.
+                </p>
+
+                <!-- Software Components Stack Badges -->
+                <div class="pt-2 flex flex-wrap items-center justify-center gap-2">
+                    <span class="px-3 py-1.5 dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-lg text-xs font-mono dark:text-cyan-400 text-cyan-600 flex items-center gap-2 shadow-sm">
+                        <i class="fa-brands fa-android"></i> Android Native App
+                    </span>
+                    <span class="px-3 py-1.5 dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-lg text-xs font-mono dark:text-emerald-400 text-emerald-600 flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-code font-bold"></i> REST API (Port 8030)
+                    </span>
+                    <span class="px-3 py-1.5 dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-lg text-xs font-mono dark:text-purple-400 text-purple-600 flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-database"></i> MySQL / XAMPP Storage
+                    </span>
+                </div>
+
+                <!-- Call to Actions -->
+                <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#download" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-sm tracking-wide uppercase hover:shadow-lg hover:shadow-cyan-500/20 transition-all text-center">
+                        <i class="fa-solid fa-download mr-1.5"></i> Download APK App
+                    </a>
+                    <a href="#screenshots" class="w-full sm:w-auto px-8 py-3.5 rounded-xl dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-300 hover:border-cyan-500 dark:text-slate-200 text-slate-700 font-semibold text-sm tracking-wide transition-all text-center">
+                        View App Preview
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- App Screenshots / Showcase Section -->
+    <section id="screenshots" class="py-16 dark:bg-[#0c111d] bg-slate-100/70 border-y dark:border-slate-800/80 border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-mono font-bold text-cyan-500 uppercase tracking-widest">Interface Overview</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold dark:text-white text-slate-900 mt-1">Application Screenshots</h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2">Take a look at the Android Gateway app user interface and control panel.</p>
+            </div>
+
+            <!-- Grid of Screenshots -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-center justify-center max-w-5xl mx-auto">
+
+                <!-- Screenshot Card 1: Dashboard -->
+                <div class="group dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/50">
+                    <div class="relative rounded-xl overflow-hidden aspect-[9/19] bg-slate-950 border dark:border-slate-800 border-slate-200 flex items-center justify-center p-1">
+                        <img src="./Public/screenshot1.jpg"
+                             alt="Dashboard Screenshot"
+                             class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                        <!-- Fallback UI if image missing -->
+                        <div class="hidden text-center p-6 flex-col items-center justify-center space-y-3 w-full h-full">
+                            <i class="fa-solid fa-mobile-screen text-4xl text-cyan-500"></i>
+                            <p class="text-xs font-mono text-slate-400">
+                                <strong class="text-slate-200 block text-sm mb-1">Dashboard</strong>
+                                <span class="text-[10px] text-slate-500">[Place screenshot1.png in ./assets]</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <h3 class="font-bold text-sm dark:text-white text-slate-900">Dashboard</h3>
+                        <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Monitors active HTTP status, IP address, and Port 8030 service.</p>
+                    </div>
+                </div>
+
+                <!-- Screenshot Card 2: MySQL Setting -->
+                <div class="group dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/50">
+                    <div class="relative rounded-xl overflow-hidden aspect-[9/19] bg-slate-950 border dark:border-slate-800 border-slate-200 flex items-center justify-center p-1">
+                        <img src="./Public/screenshot2.jpg"
+                             alt="MySQL Setting Screenshot"
+                             class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                        <!-- Fallback UI if image missing -->
+                        <div class="hidden text-center p-6 flex-col items-center justify-center space-y-3 w-full h-full">
+                            <i class="fa-solid fa-database text-4xl text-emerald-500"></i>
+                            <p class="text-xs font-mono text-slate-400">
+                                <strong class="text-slate-200 block text-sm mb-1">MySQL Setting</strong>
+                                <span class="text-[10px] text-slate-500">[Place screenshot2.png in ./assets]</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <h3 class="font-bold text-sm dark:text-white text-slate-900">MySQL Setting</h3>
+                        <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Configures XAMPP database host connection strings.</p>
+                    </div>
+                </div>
+
+                <!-- Screenshot Card 3: Documentation -->
+                <div class="group dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-purple-500/50 sm:col-span-2 lg:col-span-1 max-w-xs justify-self-center w-full">
+                    <div class="relative rounded-xl overflow-hidden aspect-[9/19] bg-slate-950 border dark:border-slate-800 border-slate-200 flex items-center justify-center p-1">
+                        <img src="./Public/screenshot3.jpg"
+                             alt="Documentation Screen Screenshot"
+                             class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                        <!-- Fallback UI if image missing -->
+                        <div class="hidden text-center p-6 flex-col items-center justify-center space-y-3 w-full h-full">
+                            <i class="fa-solid fa-book text-4xl text-purple-500"></i>
+                            <p class="text-xs font-mono text-slate-400">
+                                <strong class="text-slate-200 block text-sm mb-1">Documentation</strong>
+                                <span class="text-[10px] text-slate-500">[Place screenshot3.png in ./assets]</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <h3 class="font-bold text-sm dark:text-white text-slate-900">Documentation</h3>
+                        <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Shows setup instructions and live API endpoint usage.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SMS API Endpoints Documentation -->
+    <section id="endpoints" class="py-16 border-b dark:border-slate-800/80 border-slate-200 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-mono font-bold text-cyan-500 uppercase tracking-widest">REST API Documentation</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold dark:text-white text-slate-900 mt-1">HTTP Request Endpoints</h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2">
+                    Standard JSON HTTP endpoints for integrating SMS dispatch into any Web or Desktop Application. <br>
+                    <span class="text-cyan-500 font-mono text-xs font-bold block mt-1">Note: Default Server Port is 8030. Replace "192.168.1.X" with your Phone's active IP address.</span>
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-6 sm:gap-8">
+                <!-- Endpoint 1: Status Check -->
+                <div class="p-4 sm:p-6 rounded-2xl dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 shadow-sm space-y-4 max-w-full overflow-hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <span class="w-fit px-2.5 py-1 rounded text-xs font-mono bg-emerald-500/10 text-emerald-500 font-bold uppercase">GET</span>
+                        <span class="font-mono text-xs dark:text-cyan-400 text-cyan-600 font-semibold break-all">http://192.168.1.X:8030/status</span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold dark:text-white text-slate-900">1. API Status Check</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-600 leading-relaxed">
+                        Checks whether the SMS API service is running and reachable on the local Android phone server.
+                    </p>
+
+                    <div class="rounded-xl dark:bg-slate-950 bg-slate-900 p-3 sm:p-4 border dark:border-slate-800 border-slate-800 max-w-full overflow-x-auto custom-scrollbar">
+                        <pre class="font-mono text-xs text-cyan-300 whitespace-pre-wrap break-words sm:whitespace-pre sm:break-normal"><code>// Replace with Android Phone's Local IP
+const API_BASE_URL = "http://192.168.1.15:8030";
+
+const checkStatus = async () => {
+    try {
+        const res = await fetch(API_BASE_URL + "/status");
+        const data = await res.json();
+        console.log(data);
+    } catch (error) {
+        console.error("SMS Gateway Offline", error);
+    }
+};
+
+checkStatus();</code></pre>
+                    </div>
+                </div>
+
+                <!-- Endpoint 2: Send SMS -->
+                <div class="p-4 sm:p-6 rounded-2xl dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 shadow-sm space-y-4 max-w-full overflow-hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <span class="w-fit px-2.5 py-1 rounded text-xs font-mono bg-cyan-500/10 text-cyan-500 font-bold uppercase">POST</span>
+                        <span class="font-mono text-xs dark:text-cyan-400 text-cyan-600 font-semibold break-all">http://192.168.1.X:8030/send</span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold dark:text-white text-slate-900">2. Send SMS Payload</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-600 leading-relaxed">
+                        Sends SMS to single or comma-separated multiple phone numbers via standard JSON request body.
+                    </p>
+
+                    <div class="rounded-xl dark:bg-slate-950 bg-slate-900 p-3 sm:p-4 border dark:border-slate-800 border-slate-800 max-w-full overflow-x-auto custom-scrollbar">
+                        <pre class="font-mono text-xs text-emerald-300 whitespace-pre-wrap break-words sm:whitespace-pre sm:break-normal"><code>// Replace with Android Phone's Local IP
+const API_BASE_URL = "http://192.168.1.15:8030";
+
+const payload = {
+    receiver: "09123456789,09223334444",
+    message: "Hello from Android SMS API!"
+};
+
+const sendSms = async () => {
+    const res = await fetch(API_BASE_URL + "/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    console.log(result);
+};</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Database Integration Guide -->
+    <section id="database" class="py-16 dark:bg-[#0c111d] bg-slate-100/70 border-b dark:border-slate-800/80 border-slate-200 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-8 items-center">
+
+                <div class="lg:col-span-6 space-y-4">
+                    <span class="text-xs font-mono font-bold text-cyan-500 uppercase tracking-widest">Database Sync Setup</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold dark:text-white text-slate-900">Storing SMS to MySQL</h2>
+                    <p class="dark:text-slate-400 text-slate-600 text-sm leading-relaxed">
+                        Automatically forward and record incoming SMS messages straight to your local XAMPP or remote MySQL database table.
+                    </p>
+
+                    <div class="space-y-3 pt-2 text-xs dark:text-slate-300 text-slate-700">
+                        <div class="flex items-start gap-3 p-3 rounded-xl dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-bold font-mono shrink-0">1</span>
+                            <div>
+                                <strong class="dark:text-white text-slate-900 block">XAMPP MySQL Setup</strong>
+                                Install XAMPP, start MySQL service, and disable Windows Firewall for local network access.
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 rounded-xl dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold font-mono shrink-0">2</span>
+                            <div>
+                                <strong class="dark:text-white text-slate-900 block">User Privileges & Hostname</strong>
+                                Set MySQL Hostname wildcard to <code>%</code> and enable <strong>Grant all privileges</strong> for the Android connection.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 max-w-full overflow-hidden">
+                    <div class="p-4 sm:p-6 rounded-2xl dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 shadow-lg space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b dark:border-slate-800 border-slate-200 font-mono text-xs">
+                            <span class="font-bold dark:text-white text-slate-900">MYSQL CONNECTION STRING</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold">XAMPP / MYSQL</span>
+                        </div>
+
+                        <p class="text-xs dark:text-slate-400 text-slate-600">
+                            Paste this connection string format into your Android app connection settings:
+                        </p>
+
+                        <div class="p-3 sm:p-4 rounded-xl dark:bg-slate-950 bg-slate-900 border dark:border-slate-800 border-slate-800 font-mono text-xs text-cyan-300 overflow-x-auto custom-scrollbar">
+                            <code class="whitespace-pre-wrap sm:whitespace-pre break-all sm:break-normal">server=192.168.1.1;port=3306;uid=Your_Username;password=;database=Your_Database</code>
+                        </div>
+
+                        <div class="pt-2 text-[11px] font-mono dark:text-slate-400 text-slate-500 space-y-1">
+                            <p><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> Stores received messages instantly</p>
+                            <p><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> Allows zero-delay local database triggers</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Grid -->
+    <section id="features" class="py-20 border-b dark:border-slate-800/80 border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-mono font-bold text-cyan-500 uppercase tracking-widest">System Capabilities</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold dark:text-white text-slate-900 mt-1">Core System Features</h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2">Everything you need to run your personal SMS gateway directly on your phone.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-xl p-4 shadow-sm hover:border-cyan-500/50 transition-all">
+                    <div class="text-cyan-500 text-lg mb-2"><i class="fa-solid fa-sim-card"></i></div>
+                    <h3 class="text-sm font-bold dark:text-white text-slate-900">1. SIM Card Load</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Uses your existing phone network plan or unli-text load with zero additional SMS gateway costs.</p>
+                </div>
+
+                <div class="dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-xl p-4 shadow-sm hover:border-cyan-500/50 transition-all">
+                    <div class="text-cyan-500 text-lg mb-2"><i class="fa-solid fa-users text-cyan-500"></i></div>
+                    <h3 class="text-sm font-bold dark:text-white text-slate-900">2. Bulk SMS Sending</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Send to multiple phone numbers simultaneously using simple comma-separated formatting.</p>
+                </div>
+
+                <div class="dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-xl p-4 shadow-sm hover:border-cyan-500/50 transition-all">
+                    <div class="text-emerald-500 text-lg mb-2"><i class="fa-solid fa-database"></i></div>
+                    <h3 class="text-sm font-bold dark:text-white text-slate-900">3. Direct MySQL Sync</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Automatically store incoming SMS records straight to your target database table.</p>
+                </div>
+
+                <div class="dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-xl p-4 shadow-sm hover:border-cyan-500/50 transition-all">
+                    <div class="text-purple-500 text-lg mb-2"><i class="fa-solid fa-infinity"></i></div>
+                    <h3 class="text-sm font-bold dark:text-white text-slate-900">4. Free & Unlimited</h3>
+                    <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">No monthly subscription fees, credit charges, or API query limits.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Downloads & Repositories Section -->
+    <section id="download" class="py-20 border-t dark:border-slate-800/80 border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-mono font-bold text-cyan-500 uppercase tracking-widest">Get The Software</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold dark:text-white text-slate-900 mt-1">Downloads & Source Code</h2>
+                <p class="dark:text-slate-400 text-slate-600 text-sm mt-2">Download the ready-to-use Android APK or clone/explore the source code repository on GitHub.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <!-- Card 1: Android APK Download -->
+                <div class="dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-500 font-bold uppercase">ANDROID APK</span>
+                            <span class="text-xs font-mono dark:text-slate-500 text-slate-400">v1.0.0</span>
+                        </div>
+                        <h3 class="text-lg font-bold dark:text-white text-slate-900 mt-3 flex items-center gap-2">
+                            <i class="fa-brands fa-android text-emerald-500"></i> Android Gateway App
+                        </h3>
+                        <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Standalone compiled APK hosting the embedded REST HTTP server on default port 8030.</p>
+
+                        <div class="mt-4 space-y-1 text-xs font-mono dark:text-slate-400 text-slate-500">
+                            <p><i class="fa-solid fa-angle-right text-cyan-500 mr-1"></i> Android 7.0 (Nougat) and higher</p>
+                            <p><i class="fa-solid fa-angle-right text-cyan-500 mr-1"></i> Pre-built ready for direct installation</p>
+                        </div>
+                    </div>
+
+                    <a href="https://www.mediafire.com/file/bj4rhxsw6lppl6n/BNet.SMS.Mobile.Apk.zip/file" class="mt-6 w-full py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs uppercase rounded-xl transition-all text-center block shadow-lg shadow-cyan-500/20 hover:brightness-110">
+                        <i class="fa-solid fa-download mr-1"></i> Download APK File
+                    </a>
+                </div>
+
+                <!-- Card 2: GitHub Repository -->
+                <div class="dark:bg-slate-900 bg-white border dark:border-slate-800 border-slate-200 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded text-[10px] font-mono bg-purple-500/10 text-purple-400 font-bold uppercase">OPEN SOURCE</span>
+                            <span class="text-xs font-mono dark:text-slate-500 text-slate-400">GitHub</span>
+                        </div>
+                        <h3 class="text-lg font-bold dark:text-white text-slate-900 mt-3 flex items-center gap-2">
+                            <i class="fa-brands fa-github text-white"></i> GitHub Source Code
+                        </h3>
+                        <p class="text-xs dark:text-slate-400 text-slate-500 mt-1">Access full source files, contribute, or build and customize the Android gateway project locally.</p>
+
+                        <div class="mt-4 space-y-1 text-xs font-mono dark:text-slate-400 text-slate-500">
+                            <p><i class="fa-solid fa-angle-right text-purple-400 mr-1"></i> Complete Android Studio Project</p>
+                            <p><i class="fa-solid fa-angle-right text-purple-400 mr-1"></i> MIT License / Free to Customize</p>
+                        </div>
+                    </div>
+
+                    <a href="https://github.com/bryanjaybodino/BNet.Mobile.SMS" target="_blank" class="mt-6 w-full py-3 dark:bg-slate-800 bg-slate-900 text-white font-bold text-xs uppercase rounded-xl transition-all text-center block border dark:border-slate-700 border-slate-800 hover:bg-slate-800">
+                        <i class="fa-brands fa-github mr-1"></i> View on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="dark:bg-[#070a11] bg-slate-200/80 border-t dark:border-slate-800 border-slate-300 py-10 text-xs dark:text-slate-400 text-slate-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-cyan-500 text-slate-950 font-black flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <span class="font-bold dark:text-white text-slate-900 text-sm">Android SMS API Gateway</span>
+                    <span class="text-[10px] font-mono text-emerald-500">100% Free Software</span>
+                </div>
+
+                <p>&copy; 2026 Android SMS API Gateway. Free & Unlimited SMS Server.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Handlers -->
+    <script>
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                updateThemeIcon(false);
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                updateThemeIcon(false);
+            } else {
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                updateThemeIcon(true);
+            }
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('themeIcon');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun text-amber-400';
+            } else {
+                icon.className = 'fa-solid fa-moon text-slate-700';
+            }
+        }
+
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function () {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        });
+
+        initTheme();
+
+        function handleMessengerClick(el) {
+            const isMobile = window.matchMedia("(max-width: 1024px)").matches ||
+                ('ontouchstart' in window) ||
+                navigator.maxTouchPoints > 0;
+
+            if (el.classList.contains('loading')) return;
+
+            if (isMobile) {
+                el.classList.add('loading');
+            }
+
+            window.open('https://m.me/bodino.a.bryanjay', '_blank');
+
+            if (isMobile) {
+                setTimeout(function () {
+                    el.classList.remove('loading');
+                }, 15000);
+            }
+        }
+    </script>
+
+    <a href="javascript:void(0);"
+       onclick="handleMessengerClick(this)"
+       class="messenger-button"
+       title="Message on Facebook Messenger">
+        <i class="fab fa-facebook-messenger icon-default"></i>
+        <i class="fas fa-spinner icon-loading"></i>
+        <span class="text-default">Chat Now</span>
+        <span class="text-loading">Opening...</span>
+    </a>
+</body>
+</html>

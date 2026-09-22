@@ -115,6 +115,10 @@
     <AndroidAsset Include="Assets\libraries\fonts\bootstrap-icons.woff2" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
+    <None Include="Public\webfonts\fa-brands-400.woff2" />
+    <None Include="Public\webfonts\fa-regular-400.woff2" />
+    <None Include="Public\webfonts\fa-solid-900.woff2" />
+    <None Include="Public\webfonts\fa-v4compatibility.woff2" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_main.xml">
@@ -174,8 +178,16 @@
     <AndroidResource Include="Resources\drawable\icon.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Public\screenshot2.jpg" />
+    <Content Include="Public\screenshot1.jpg" />
+    <Content Include="Public\screenshot3.jpg" />
     <Content Include="sdk.txt" />
+    <Content Include="Public\font-awesome.min.css" />
+    <Content Include="Public\fonts.googleapis.css" />
+    <Content Include="Public\tailwindcss.js" />
+    <Content Include="index.html" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
     Other similar extension points exist, see Microsoft.Common.targets.
