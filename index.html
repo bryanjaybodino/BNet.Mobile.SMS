@@ -175,9 +175,51 @@
                 content: ' (click to close)';
                 font-size: .7rem
             }
+
+        /* Floating Audio Player Button */
+        .music-player-btn {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            height: 50px;
+            padding: 0 16px;
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+            transition: all 0.3s ease;
+            z-index: 5000;
+            color: #0f172a;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+            .music-player-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(6, 182, 212, 0.6);
+            }
+
+            .music-player-btn:active {
+                transform: scale(0.95);
+            }
     </style>
 </head>
 <body class="custom-scrollbar overflow-x-hidden">
+
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop autoplay muted preload="auto">
+        <source src="./assets/music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Floating Audio Control Button -->
+    <button id="musicToggleBtn" onclick="toggleAudio()" class="music-player-btn" title="Toggle Background Music">
+        <i id="musicIcon" class="fa-solid fa-volume-xmark text-lg"></i>
+        <span id="musicStatusText">Muted</span>
+    </button>
 
     <!-- Navigation Header -->
     <header class="sticky top-0 z-50 backdrop-blur-md dark:bg-[#090d16]/80 bg-white/80 border-b dark:border-slate-800 border-slate-200 transition-colors">
@@ -678,6 +720,62 @@ const sendSms = async () => {
                 setTimeout(function () {
                     el.classList.remove('loading');
                 }, 15000);
+            }
+        }
+
+        /* Music Autoplay & Controls Setup */
+        const audio = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicStatusText = document.getElementById('musicStatusText');
+
+        // Start audio muted so browsers allow autoplay instantly
+        audio.muted = true;
+        audio.play().then(() => {
+            updatePlayerUI(false); // Initially muted
+        }).catch(err => {
+            console.log("Autoplay waiting for interaction...", err);
+        });
+
+        // Function to enable sound on user's very first click anywhere on the page
+        function enableSound() {
+            if (audio.muted) {
+                audio.muted = false;
+                audio.play();
+                updatePlayerUI(true);
+            }
+            // Remove event listeners after initial trigger
+            document.removeEventListener('click', enableSound);
+            document.removeEventListener('keydown', enableSound);
+            document.removeEventListener('touchstart', enableSound);
+        }
+
+        // Attach interaction listeners
+        document.addEventListener('click', enableSound);
+        document.addEventListener('keydown', enableSound);
+        document.addEventListener('touchstart', enableSound);
+
+        // Manual Toggle Button Function
+        function toggleAudio() {
+            if (audio.muted) {
+                audio.muted = false;
+                audio.play();
+                updatePlayerUI(true);
+            } else if (audio.paused) {
+                audio.play();
+                updatePlayerUI(true);
+            } else {
+                audio.pause();
+                updatePlayerUI(false);
+            }
+        }
+
+        function updatePlayerUI(isPlaying) {
+            if (isPlaying && !audio.muted) {
+                musicIcon.className = "fa-solid fa-compact-disc text-lg animate-spin";
+                musicStatusText.textContent = "Playing";
+            } else {
+                musicIcon.className = "fa-solid fa-volume-xmark text-lg";
+                musicStatusText.textContent = "Muted";
             }
         }
     </script>
