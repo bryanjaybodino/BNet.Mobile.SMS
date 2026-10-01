@@ -216,7 +216,7 @@
     </audio>
 
     <!-- Floating Audio Control Button -->
-    <button id="musicToggleBtn" onclick="toggleAudio()" class="music-player-btn" title="Toggle Background Music">
+    <button id="musicToggleBtn" class="music-player-btn" title="Toggle Background Music">
         <i id="musicIcon" class="fa-solid fa-volume-xmark text-lg"></i>
         <span id="musicStatusText">Muted</span>
     </button>
@@ -727,50 +727,51 @@ const sendSms = async () => {
         const audio = document.getElementById('bgMusic');
         const musicIcon = document.getElementById('musicIcon');
         const musicStatusText = document.getElementById('musicStatusText');
+        const musicBtn = document.getElementById('musicToggleBtn');
 
-        // Start audio muted so browsers allow autoplay instantly
+        // Attempt initial muted play (allowed by modern mobile browsers)
         audio.muted = true;
-        audio.play().then(() => {
-            updatePlayerUI(false); // Initially muted
-        }).catch(err => {
+        audio.play().catch(err => {
             console.log("Autoplay waiting for interaction...", err);
         });
 
-        // Function to enable sound on user's very first click anywhere on the page
+        // Function to enable sound on first user touch/click anywhere
         function enableSound() {
-            if (audio.muted) {
-                audio.muted = false;
-                audio.play();
+            audio.muted = false;
+            audio.play().then(() => {
                 updatePlayerUI(true);
-            }
-            // Remove event listeners after initial trigger
+            }).catch(() => { });
+
+            // Remove setup listeners once triggered
             document.removeEventListener('click', enableSound);
-            document.removeEventListener('keydown', enableSound);
             document.removeEventListener('touchstart', enableSound);
         }
 
-        // Attach interaction listeners
-        document.addEventListener('click', enableSound);
-        document.addEventListener('keydown', enableSound);
-        document.addEventListener('touchstart', enableSound);
+        // Register initial interaction handlers
+        document.addEventListener('click', enableSound, { once: true });
+        document.addEventListener('touchstart', enableSound, { once: true });
 
-        // Manual Toggle Button Function
-        function toggleAudio() {
-            if (audio.muted) {
+        // Directly bind touch & click handlers to the toggle button for mobile
+        function handleToggle(e) {
+            if (e) e.preventDefault(); // Prevent double-triggering on mobile tap
+
+            if (audio.muted || audio.paused) {
                 audio.muted = false;
-                audio.play();
-                updatePlayerUI(true);
-            } else if (audio.paused) {
-                audio.play();
-                updatePlayerUI(true);
+                audio.play().then(() => {
+                    updatePlayerUI(true);
+                }).catch(err => console.log("Play failed:", err));
             } else {
                 audio.pause();
                 updatePlayerUI(false);
             }
         }
 
+        // Attach both touchstart and click to ensure instant response on mobile
+        musicBtn.addEventListener('touchstart', handleToggle, { passive: false });
+        musicBtn.addEventListener('click', handleToggle);
+
         function updatePlayerUI(isPlaying) {
-            if (isPlaying && !audio.muted) {
+            if (isPlaying && !audio.muted && !audio.paused) {
                 musicIcon.className = "fa-solid fa-compact-disc text-lg animate-spin";
                 musicStatusText.textContent = "Playing";
             } else {
